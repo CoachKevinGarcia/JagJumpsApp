@@ -17,7 +17,7 @@
   --silver: #8A8A9A;
   --silver-light: #B0B0C4;
   --white: #F5F0E8;
-  --muted: #7A7060;
+  --muted: #F5F0E8;
   --beginner: #3A7CA5;
   --beginner-light: #5BA3CC;
   --elite: #C75B7A;
@@ -834,7 +834,21 @@ html, body {
 
 .toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ── UTILS ── */
+/* White + black outline for all muted-color text elements */
+.home-sub, .home-label, .nav-title, .week-tile-date, .weeks-section-label,
+.day-focus, .day-tile-focus, .day-tile-int-pct, .day-int-label, .day-int-pct,
+.int-day-name, .int-day-pct, .card-label, .roster-group-label, .section-label,
+.section-card-title, .block-label, .vol-pill, .wc-title, .modal-label,
+.athlete-marks, .int-label, .int-pct, .week-tile-chevron,
+.day-hero-focus, .day-hero-label, .week-hero-label, .week-hero-date,
+.weeks-section-label, .note-card-label, .coaching-box-label,
+.add-week-btn, .card-edit, .nav-action, .day-tile-tag {
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
 .divider {
   height: 1px;
   background: rgba(255,255,255,0.06);

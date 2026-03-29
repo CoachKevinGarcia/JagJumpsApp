@@ -899,7 +899,7 @@ html, body {
         <div class="home-title">Jump<span>Planner</span></div>
       </div>
     </div>
-    <div class="home-sub">Long Jump & Triple Jump · Jurupa Valley</div>
+    <div class="home-sub">Long Jump & Triple Jump · Jurupa Valley &nbsp;·&nbsp; <span id="app-version-label" style="font-family:'DM Mono',monospace;font-size:10px;opacity:0.6;"></span></div>
   </div>
   <div class="weeks-grid">
     <div class="weeks-section-label">Practice Weeks</div>
@@ -998,6 +998,11 @@ html, body {
 <div class="toast" id="toast"></div>
 
 <script>
+// ══════════════════════════════════════════════
+// VERSION
+// ══════════════════════════════════════════════
+const APP_VERSION = 'v1.2';
+
 // ══════════════════════════════════════════════
 // DATA SEED
 // ══════════════════════════════════════════════
@@ -1390,6 +1395,8 @@ let currentDayId = null;
 async function initApp() {
   const saved = await loadData();
   APP = saved || JSON.parse(JSON.stringify(SEED_DATA));
+  const vEl = document.getElementById('app-version-label');
+  if (vEl) vEl.textContent = APP_VERSION;
   renderHome();
 }
 

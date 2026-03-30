@@ -862,6 +862,69 @@ html, body {
   font-size: 13px;
   font-weight: 300;
 }
+
+/* ── GOALS TILE ── */
+.goals-grid-app { display: flex; flex-direction: column; gap: 0; }
+
+.goal-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.goal-row:last-child { border-bottom: none; }
+.goal-row-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.goal-row-main { flex: 1; }
+.goal-row-name { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+.goal-row-event { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-bottom: 5px; }
+.goal-row-targets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
+.goal-target-pill { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+.goal-target-pill.elite-pill { background: rgba(199,91,122,0.15); color: var(--elite-light); border: 1px solid rgba(199,91,122,0.3); }
+.goal-target-pill.begin-pill { background: rgba(58,124,165,0.15); color: var(--beginner-light); border: 1px solid rgba(58,124,165,0.3); }
+.goal-row-cue { font-size: 11px; color: rgba(245,240,232,0.5); font-style: italic; line-height: 1.5; }
+
+/* ── COLLAPSIBLE CARDS ── */
+.card-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-chevron {
+  font-size: 16px;
+  color: var(--muted);
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.card-chevron.open { transform: rotate(90deg); }
+
+.card-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 16px;
+}
+
+.card-body.open {
+  max-height: 2000px;
+  padding: 14px 16px;
+}
+
+/* Day tiles section — not a card, always visible */
+.days-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 2px;
+}
+
+.recovery-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.recovery-row:last-child { border-bottom: none; }
+.recovery-badge { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 2px 7px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+.recovery-badge.warn { color: rgba(232,122,90,0.9); background: rgba(232,122,90,0.1); border: 1px solid rgba(232,122,90,0.25); }
+.recovery-badge.info { color: var(--silver-light); background: rgba(176,176,196,0.1); border: 1px solid rgba(176,176,196,0.25); }
+.recovery-text { font-size: 12px; font-weight: 300; color: rgba(245,240,232,0.65); line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -896,10 +959,9 @@ html, body {
       </svg>
       <div>
         <div class="home-label">2026 Season</div>
-        <div class="home-title">Jump<span>Planner</span></div>
-      </div>
+        <div class="home-title">A Jaguar's<span>Horizontal Jumps Plan</span></div>
     </div>
-    <div class="home-sub">Long Jump & Triple Jump · Jurupa Valley &nbsp;·&nbsp; <span id="app-version-label" style="font-family:'DM Mono',monospace;font-size:10px;opacity:0.6;"></span></div>
+    <div class="home-sub"><span id="app-version-label" style="font-family:'DM Mono',monospace;font-size:10px;opacity:0.6;"></span></div>
   </div>
   <div class="weeks-grid">
     <div class="weeks-section-label">Practice Weeks</div>
@@ -922,49 +984,95 @@ html, body {
   </div>
   <div class="week-content">
 
-    <!-- Intensity Overview -->
+    <!-- Intensity Overview — collapsed by default -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCard(this)">
         <div class="card-label">Intensity Overview</div>
+        <div class="card-chevron">›</div>
       </div>
       <div class="card-body">
         <div class="intensity-grid" id="week-intensity-grid"></div>
       </div>
     </div>
 
-    <!-- Coaching Notes -->
+    <!-- Schedule Notes — collapsed by default -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-label">Schedule Notes</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditScheduleNotesModal()">Edit</div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>
+      <div class="card-body" id="week-schedule-notes"></div>
+    </div>
+
+    <!-- Coaching Notes — collapsed by default -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
         <div class="card-label">Coaching Notes</div>
-        <div class="card-edit" onclick="openEditNotesModal()">Edit</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditNotesModal()">Edit</div>
+          <div class="card-chevron">›</div>
+        </div>
       </div>
       <div class="card-body">
         <div class="notes-text" id="week-coaching-notes"></div>
       </div>
     </div>
 
-    <!-- Upcoming Meets -->
+    <!-- Upcoming Meets — OPEN by default -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCard(this)">
         <div class="card-label">Upcoming Meets</div>
-        <div class="card-edit" onclick="openEditMeetsModal()">Edit</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditMeetsModal()">Edit</div>
+          <div class="card-chevron open">›</div>
+        </div>
       </div>
-      <div class="card-body" id="week-meets"></div>
+      <div class="card-body open" id="week-meets"></div>
     </div>
 
-    <!-- Athlete Roster -->
+    <!-- Athlete Roster — collapsed by default -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header" onclick="toggleCard(this)">
         <div class="card-label">Athlete Roster</div>
-        <div class="card-edit" onclick="openEditAthleteModal(null)">+ Add</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditAthleteModal(null)">+ Add</div>
+          <div class="card-chevron">›</div>
+        </div>
       </div>
       <div class="card-body" id="week-roster"></div>
     </div>
 
-    <!-- Day Tiles -->
+    <!-- Meet Goals — collapsed by default -->
+    <div class="card">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-label">Meet Goals</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditGoalModal(null)">+ Add</div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>
+      <div class="card-body" id="week-goals"></div>
+    </div>
+
+    <!-- Day Tiles — always visible, not a collapsible card -->
     <div class="weeks-section-label" style="margin-top:4px;">Practice Days</div>
     <div class="days-grid" id="week-day-tiles"></div>
     <button class="add-week-btn" onclick="openAddDayModal()" style="margin:0;">＋ Add Day</button>
+
+    <!-- Recovery Guidance — collapsed by default -->
+    <div class="card" style="margin-top:14px;">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-label">Recovery Guidance</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="card-edit" onclick="event.stopPropagation();openEditRecoveryModal()">Edit</div>
+          <div class="card-chevron">›</div>
+        </div>
+      </div>
+      <div class="card-body" id="week-recovery"></div>
+    </div>
 
   </div>
 </div>
@@ -1001,7 +1109,7 @@ html, body {
 // ══════════════════════════════════════════════
 // VERSION
 // ══════════════════════════════════════════════
-const APP_VERSION = 'v1.2';
+const APP_VERSION = 'v1.7';
 
 // ══════════════════════════════════════════════
 // DATA SEED
@@ -1017,6 +1125,9 @@ const SEED_DATA = {
       color: '#B0B0C4',
       meet: null,
       coachingNotes: '<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',
+      scheduleNotes: [],
+      recovery: [],
+      goals: [],
       meets: [
         { date: '4/4', type: 'Invitational', name: 'Raincross Riverside City Championships' },
         { date: '4/9', type: 'Dual Meet', name: 'Ramona (Away)' }
@@ -1194,12 +1305,39 @@ const SEED_DATA = {
     },
     {
       id: 'pre-meet',
-      name: 'Pre-Meet Week',
+      name: 'Raincross Week',
       label: 'Meet Prep',
-      dates: 'Mon Mar 31 – Fri Apr 4 · Meet Saturday',
+      dates: 'Mon 3/30 – Fri 4/3 · Raincross Riverside City Championships',
       color: '#E87A5A',
       meet: 'SAT 4/4 — Raincross Riverside City Championships',
       coachingNotes: '<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',
+      scheduleNotes: [
+        { badge: 'MON', type: 'warn', text: 'Lift first this week, then bounds — CNS-fresh legs for better bounding output' },
+        { badge: '6-STEP', type: 'info', text: 'New 6-step approaches developed Wed, locked in Thu — every athlete leaves Thursday with a written mark card' },
+        { badge: 'LJ ONLY', type: 'info', text: 'Pablo, Joel, Eddie, Eduardo Avina, Sofia, Sabrina skip all TJ sections' },
+        { badge: 'FRI', type: 'warn', text: '2 LJ max effort jumps · 1 TJ max effort jump — hard cap for everyone' }
+      ],
+      recovery: [
+        { badge: 'SLEEP', type: 'info', text: '8+ hours Thu and Fri night — this is where readiness happens' },
+        { badge: 'HYDRATION', type: 'info', text: 'Consistent water all week — don\'t play catch-up Saturday morning' },
+        { badge: 'NUTRITION', type: 'info', text: 'Carb-rich meals Thu and Fri; light but fueled Saturday morning' },
+        { badge: 'NO EXTRAS', type: 'warn', text: 'No added training Thu–Sat outside this plan — trust the week' }
+      ],
+      goals: [
+        { id: 'g-ab',      athleteName: 'AB Hernandez',         group: 'elite',    events: 'LJ · TJ · HJ', targets: ["LJ 20'0\"+ PR", "TJ 42'0\"+ PR"],  cue: "Attack the board with speed, trust the step phase — don't rush the jump. Let it happen." },
+        { id: 'g-juan',    athleteName: 'Juan Ledesma',          group: 'elite',    events: 'LJ · TJ',       targets: ["LJ 18'6\"+", "TJ 33'0\"+ PR"],     cue: 'Crack 33 feet in TJ — your step phase is the key. Hold it longer than feels comfortable.' },
+        { id: 'g-levi',    athleteName: 'Levi Gutierrez',        group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 15'0\"+", "TJ 27'0\"+ PR"],     cue: 'Stay tall off the board in LJ. In TJ — count the three contacts out loud in your head. Rhythm wins.' },
+        { id: 'g-daniela', athleteName: 'Daniela Gamboa',        group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 13'0\"+", 'Clean rhythm TJ'],   cue: 'Distance will come. Today: hit the board, feel all three contacts, land on two feet. That\'s a win.' },
+        { id: 'g-pablo',   athleteName: 'Pablo Jara',            group: 'beginner', events: 'LJ',            targets: ["LJ 17'0\"+ PR"],                   cue: "You have the speed for 17 feet. Commit to the board — don't hesitate on the last two steps." },
+        { id: 'g-camyla',  athleteName: 'Camyla Ramirez-Tapia',  group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 10'6\"+ PR", 'First clean TJ'], cue: 'First clean TJ competition. Slow it down if needed — rhythm beats distance every time at this stage.' },
+        { id: 'g-joel',    athleteName: 'Joel Oros',             group: 'beginner', events: 'LJ',            targets: ["LJ 13'6\"+ PR"],                   cue: 'Arms up at takeoff — both of them, hard. That alone is worth 6–8 inches. Trust the drill work.' },
+        { id: 'g-eddie',   athleteName: 'Eddie Soriano',         group: 'beginner', events: 'LJ',            targets: ["LJ 13'0\"+ PR"],                   cue: "Hit the board confidently — don't slow down approaching it. Speed through the board, not into it." },
+        { id: 'g-nayeli',  athleteName: 'Nayeli',                group: 'beginner', events: 'LJ · TJ',       targets: ['First meet mark'],                  cue: 'Get a legal mark in both events. Everything else is bonus. Run hard, jump, land — done.' },
+        { id: 'g-kate',    athleteName: 'Kate Gamboa',           group: 'beginner', events: 'LJ · TJ',       targets: ['First meet mark'],                  cue: 'Same as practice — approach, attack, land. You\'ve done this all week. Saturday is just another rep.' },
+        { id: 'g-edu',     athleteName: 'Eduardo Avina',         group: 'beginner', events: 'LJ',            targets: ['First meet mark'],                  cue: "Get on the board and get a legal jump. Run through it — don't slow down at the end of the runway." },
+        { id: 'g-sofia',   athleteName: 'Sofia Gutierrez',       group: 'beginner', events: 'LJ',            targets: ["LJ 9'6\"+ PR"],                    cue: 'Swing both arms up hard at takeoff. That\'s the one cue. Everything else follows if you do that.' },
+        { id: 'g-sabrina', athleteName: 'Sabrina',               group: 'beginner', events: 'LJ',            targets: ['First meet mark'],                  cue: "Compete with confidence. You've put in the work this week — show up Saturday and trust it." }
+      ],
       meets: [
         { date: '4/4', type: 'Invitational', name: 'Raincross Riverside City Championships' },
         { date: '4/9', type: 'Dual Meet', name: 'Ramona (Away)' }
@@ -1211,7 +1349,7 @@ const SEED_DATA = {
         { id: 'levi', name: 'Levi Gutierrez', group: 'beginner', events: 'LJ · TJ', marks: "LJ 14'3.5\" · TJ 26'3\"" },
         { id: 'camyla', name: 'Camyla Ramirez-Tapia', group: 'beginner', events: 'LJ · TJ', marks: "LJ 9'10\"" },
         { id: 'nayeli', name: 'Nayeli', group: 'beginner', events: 'LJ · TJ', marks: 'No marks yet' },
-        { id: 'kata', name: 'Kata Gamboa', group: 'beginner', events: 'LJ · TJ', marks: 'No marks yet' },
+        { id: 'kata', name: 'Kate Gamboa', group: 'beginner', events: 'LJ · TJ', marks: 'No marks yet' },
         { id: 'pablo', name: 'Pablo Jara', group: 'beginner', events: 'LJ', marks: "LJ 16'2.5\"" },
         { id: 'joel', name: 'Joel Oros', group: 'beginner', events: 'LJ', marks: "LJ 12'11\"" },
         { id: 'eddie', name: 'Eddie Soriano', group: 'beginner', events: 'LJ', marks: "LJ 12'4.5\"" },
@@ -1221,28 +1359,29 @@ const SEED_DATA = {
       ],
       days: [
         {
-          id: 'mon', name: 'Monday', focus: 'Power, Bounds & Lift', tag: 'Hard Day', color: '#E87A5A', intensity: 85,
+          id: 'mon', name: 'Monday', focus: 'Activation Lift & Bounds', tag: 'Hard Day', color: '#E87A5A', intensity: 85,
           sections: [
             { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
+            { title: 'Weightroom First — Pre-Meet Activation', blocks: [
+              { type: 'lift', label: 'Lift Before Bounds This Week', drills: [{ name: 'CNS-fresh legs produce better bounding output', note: 'Lift first, then bounds — save explosive capacity for after the lift' }] },
+              { type: 'lift', label: '1a / 1b. Mass Specific Force', drills: [{ name: '1a. T-Bar Deadlift — 3×6 @ Moderate' }, { name: '1b. Box Jumps — 3×6 (moderate height)', note: 'Full hip extension at top — CNS activation' }] },
+              { type: 'lift', label: '3a / 3b. Posterior Chain — Reduced', drills: [{ name: '3a. RDL — 2×5 @ Moderate', note: 'Cut from 3×6 — activation only, not accumulation' }, { name: '3b. Kettlebell Swings — 2×6' }] },
+              { type: 'lift', label: '4a / 4b. Unilateral Leg', drills: [{ name: '4a. Single-Leg Press — 2×8 each leg' }, { name: '4b. Calf Raises — 2×12 (hold final rep)', note: 'Ankle stiffness matters meet week — keep this in' }] },
+              { type: 'lift', label: '5a. Stability — Single Movement Only', drills: [{ name: '5a. Hands Overhead Lunge — 3×5 each leg' }, { name: 'Bulgarian Split Squat — REMOVED this week', note: 'Highest soreness risk in the program — legs need to be fresh Saturday' }] },
+              { type: 'lift', label: 'Core Circuit — 2 Sets Only', centerLabel: true, drills: [{ name: 'Dead Bugs — 2×8' }, { name: 'Pallof Press — 2×8 each side' }, { name: 'Hanging Step Phase Holds — 2×8' }] }
+            ]},
             { title: 'Bounding — All Athletes', blocks: [
-              { type: 'shared', label: 'Both Groups', drills: [
+              { type: 'shared', label: 'Both Groups — Post Lift', drills: [
                 { name: 'Alternating Bounds — 4×30m', note: 'Maximize horizontal per contact; aggressive knee drive' },
                 { name: 'Single-Leg Bounds — 3×20m each leg', note: 'Reinforce takeoff leg power; stay tall' },
-                { name: 'Bound into Long Jump Landing — 3×4 bounds → pit', note: 'Feel projection angle into sand; two-foot landing' }
+                { name: 'Bound into LJ Landing — 3×4 bounds → pit', note: 'Feel projection angle into sand; two-foot landing' }
               ], pills: ['~25 min', 'Full rest between sets', 'Stop before fatigue'] }
-            ]},
-            { title: 'Weightroom (All)', blocks: [
-              { type: 'lift', label: '1a / 1b. Mass Specific Force', drills: [{ name: '1a. T-Bar Deadlift — 3×6 @ Moderate' }, { name: '1b. Box Jumps — 3×6 (moderate height)', note: 'Two-foot takeoff; full hip extension at top' }] },
-              { type: 'lift', label: '3a / 3b. Posterior Chain Superset', drills: [{ name: '3a. Romanian Deadlift (RDL) — 3×6 @ Moderate' }, { name: '3b. Kettlebell Swings — 3×6' }] },
-              { type: 'lift', label: '4a / 4b. Unilateral Leg Superset', drills: [{ name: '4a. Single-Leg Press — 2×8 each leg' }, { name: '4b. Calf Raises — 2×12 (hold final rep of each set)' }] },
-              { type: 'lift', label: '5a / 5b. Stability Superset', drills: [{ name: '5a. Hands Overhead Lunge — 3×5 each leg' }, { name: '5b. Bulgarian Split Squat — 3×5 each leg' }] },
-              { type: 'lift', label: 'Core Circuit', centerLabel: true, drills: [{ name: 'Dead Bugs — 3×8' }, { name: 'Pallof Press — 3×8 each side' }, { name: 'Hanging Step Phase Holds — 3×8', note: 'Drive knee to step-phase position and hold' }] }
             ]},
             { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
           ]
         },
         {
-          id: 'tue', name: 'Tuesday', focus: 'Phase Drills & Technique', tag: 'Drill Day', color: '#7BC8F5', intensity: 50,
+          id: 'tue', name: 'Tuesday', focus: 'Phase Drills & Speed', tag: 'Drill Day', color: '#7BC8F5', intensity: 50,
           sections: [
             { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
             { title: 'Long Jump Drills — All', blocks: [
@@ -1254,7 +1393,7 @@ const SEED_DATA = {
               ], pills: ['≤60% effort', 'Quality only'] }
             ]},
             { title: 'Triple Jump Drills — Both-Events Athletes', blocks: [
-              { type: 'shared', label: 'Daniela · Levi · Camyla · Nayeli · Kata · AB · Juan', drills: [
+              { type: 'shared', label: 'Daniela · Levi · Camyla · Nayeli · Kate · AB · Juan', drills: [
                 { name: 'Phase Walk-Through — 3× full TJ slow rhythm', note: 'Count hop-step-jump aloud; no speed' },
                 { name: 'Hop Isolation — 3×15m single-leg hops', note: 'Flat foot landing; push forward not up' },
                 { name: 'Step-Phase Emphasis — hop + hold step 3×6', note: 'Step should match or exceed hop distance' },
@@ -1263,9 +1402,13 @@ const SEED_DATA = {
                 { name: 'Arm Action Drill — stationary double-arm swing 2×10', note: 'Arms drive up simultaneously at each takeoff' }
               ], pills: ['≤60% effort', 'No full speed'] }
             ]},
+            { title: 'Speed Work — All Athletes', blocks: [
+              { type: 'shared', label: 'Both Groups · CNS Primer', drills: [
+                { name: '4×30m @ 90%', note: 'Short, sharp, done — keeps the nervous system primed without taxing recovery. Full rest between each rep.' }
+              ], pills: ['4 reps only', '90% effort', 'Full rest between'] }
+            ]},
             { title: 'Elite Additions', blocks: [
               { type: 'elite', label: 'AB · Juan', drills: [
-                { name: 'Short Speed Work — 3×30m @ 85%', note: 'Keep the nervous system primed; controlled and sharp' },
                 { name: 'Approach Run Calibration — 3 approach-only runs', note: 'Verify checkmark consistency; no chopping steps' },
                 { name: 'LJ Takeoff Precision — 4× short approach, board only', note: 'Zero foul focus; feel consistent foot strike' }
               ]}
@@ -1277,56 +1420,78 @@ const SEED_DATA = {
           id: 'wed', name: 'Wednesday', focus: 'Free Jumping & Approach Finding', tag: 'Jump Day', color: '#A8D878', intensity: 70,
           sections: [
             { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
+            { title: 'Rest Protocol — All Groups', blocks: [
+              { type: 'shared', label: 'Applied to every attempt today', drills: [
+                { name: 'Minimum 4 minutes between every jump', note: 'Walk back slowly, breathe, reset mentally. No rushed attempts — freshness on each jump is the entire point of today.' }
+              ]}
+            ]},
             { title: 'Long Jump — Free Jumping', blocks: [
-              { type: 'shared', label: 'All Athletes', drills: [
-                { name: 'Board-Off Jumps — 6–8 attempts', note: 'Disregard the board entirely — find your natural speed and rhythm. Note where you land relative to the board.' },
-                { name: 'Focus: quality takeoff angle, full arm drive, hang or kick', note: 'No stress, no fouls — this is about feeling fast and free' },
-                { name: 'Coach: observe natural attack point', note: 'Watch where each athlete is consistently taking off from — that data point drives Thursday\'s mark' },
-                { name: 'New 6-Step Approach Development', note: 'After jumps, measure back 6 steps from your average takeoff spot. Mark it. Run through 3× without jumping.' }
-              ], pills: ['6–8 jumps', 'Board off', 'Note landing zones'] }
+              { type: 'shared', label: 'All Athletes · 5 Jumps Max', drills: [
+                { name: 'Board-Off Jumps — 5 attempts', note: 'Disregard the board entirely — find your natural speed and rhythm' },
+                { name: 'Focus: quality takeoff angle, full arm drive, hang or kick', note: 'No stress, no fouls — feel fast and free' },
+                { name: 'Coach: observe natural attack point', note: 'Where each athlete consistently takes off from — this drives Thursday\'s mark' },
+                { name: 'New 6-Step Approach Development', note: 'After jumps, measure back 6 steps from average takeoff spot. Mark it. Run through 3× without jumping.' }
+              ], pills: ['5 jumps max', 'Board off', '4 min rest between'] }
             ]},
             { title: 'Triple Jump — Free Jumping', blocks: [
-              { type: 'beginner', label: 'Both-Events Athletes', drills: [
-                { name: 'Board-Off TJ Attempts — 5–6 attempts', note: 'No board pressure — find a speed that allows clean phase rhythm all the way through' },
-                { name: 'Focus: smooth hop→step→jump transition; no collapse on step', note: 'If step collapses, slow down the approach — rhythm over distance' },
-                { name: 'New 6-Step TJ Approach', note: 'Mark your natural run-up after jumps; note where you\'re attacking from' }
-              ], pills: ['5–6 jumps', 'Board off', 'Rhythm priority'] }
+              { type: 'beginner', label: 'Both-Events Athletes · 4 Jumps Max', drills: [
+                { name: 'Board-Off TJ Attempts — 4 attempts', note: 'Find a speed that allows clean phase rhythm all the way through' },
+                { name: 'Focus: smooth hop→step→jump; no collapse on step', note: 'If step collapses, slow down — rhythm over distance' },
+                { name: 'New 6-Step TJ Approach', note: 'Mark your natural run-up after jumps' }
+              ], pills: ['4 jumps max', 'Board off', '4 min rest between', 'Rhythm priority'] }
             ]},
             { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan', drills: [
-                { name: 'LJ Free Jumps — 6 attempts, board off', note: 'Find the speed that produces best projection and distance — that\'s your meet speed' },
+              { type: 'elite', label: 'AB · Juan · 10 Jumps Hard Cap', drills: [
+                { name: 'LJ Free Jumps — 6 attempts, board off', note: 'Find the speed that produces best projection — that\'s your meet speed' },
                 { name: 'TJ Free Jumps — 4 attempts, board off', note: 'Identify the approach velocity where all three phases stay controlled' },
-                { name: '6-Step Mark Setting', note: 'Lock in preliminary marks for both events — refine on Thursday' }
-              ], pills: ['10 total jumps max', '75–80% effort', 'Hard cap — no extras'] }
+                { name: '6-Step Mark Setting', note: 'Lock in preliminary marks for both events — refine Thursday' }
+              ], pills: ['10 jumps hard cap', '75–80% effort', '4 min rest between', 'No extras'] }
             ]},
             { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
           ]
         },
         {
-          id: 'thu', name: 'Thursday', focus: 'Approach Work & Landmark Lock-In', tag: 'Approach Day', color: '#B0B0C4', intensity: 60,
+          id: 'thu', name: 'Thursday', focus: 'Approach Lock-In & Meet Prep', tag: 'Approach Day', color: '#B0B0C4', intensity: 60,
           sections: [
             { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
+            { title: 'Runway Walk — All Athletes', blocks: [
+              { type: 'shared', label: 'Every Athlete · Every Event', drills: [
+                { name: 'Walk the approach — count steps out loud', note: 'Physical walk from starting mark to board. Hear the count. Own it.' },
+                { name: 'Jog the approach — count steps out loud again', note: 'Same count, slightly faster. Feel the rhythm change at the checkmark.' },
+                { name: 'Run at 85% — count steps, don\'t jump', note: 'Now it feels like a meet. Confirm the count stays consistent.' }
+              ], pills: ['3 passes per event', 'No jumping', 'Mental rehearsal'] }
+            ]},
             { title: '6-Step Approach Refinement — All', blocks: [
               { type: 'shared', label: 'All Athletes', drills: [
-                { name: 'Approach-Only Runs — 5× per event, no jumping', note: "Take Wednesday's new mark and run through it. Count steps, feel the rhythm, don't jump." },
-                { name: 'First-Step Landmark', note: "Identify where your first step lands from the starting mark — this is what you hit at the meet" },
+                { name: 'Approach-Only Runs — 5× per event', note: 'Take Wednesday\'s mark and run through it. Count steps, feel the rhythm, don\'t jump.' },
+                { name: 'First-Step Landmark', note: 'Identify where your first step lands — this is what you hit at the meet' },
                 { name: 'Checkpoint Mark', note: 'Set a mid-run checkpoint (step 3 or 4) — if you hit it, you\'ll hit the board' },
-                { name: 'Approach + Pop-Up — 3× per event', note: 'Full approach, barely jump — just feel the board underfoot at the right speed' },
-                { name: 'Mark Card', note: 'Every athlete writes down: starting mark · first-step landmark · checkpoint step · board distance. This card goes to the meet.' }
-              ], pills: ['Approach only', 'No max effort', 'Mark landmarks'] }
+                { name: 'Approach + Pop-Up — 3× per event', note: 'Full approach, barely jump — feel the board underfoot at the right speed' },
+                { name: 'Mark Card — leave with this today', note: 'Write down: starting mark · first-step landmark · checkpoint step · board distance. This goes to the meet.' }
+              ], pills: ['Approach only', '4 jumps max', 'Mark card required'] }
             ]},
-            { title: 'Light Jumping — Confidence', blocks: [
-              { type: 'beginner', label: 'Beginner Group', drills: [
-                { name: 'LJ Short Approach Jumps — 3 reps @ 70%', note: 'Use new 6-step mark; land cleanly, note any adjustments needed' },
-                { name: 'TJ Short Approach — 1–2 reps (both-events athletes)', note: 'Comfortable tempo; feel the 3-contact rhythm into pit' }
+            { title: 'Light Jumping — Beginner', blocks: [
+              { type: 'beginner', label: 'Beginner Group · 4 Jumps Max Total', drills: [
+                { name: 'LJ Short Approach Jumps — 3 reps @ 70%', note: 'Use new 6-step mark; land cleanly, note any adjustments' },
+                { name: 'TJ Short Approach — 1 rep (both-events athletes)', note: 'Comfortable tempo; feel the 3-contact rhythm into pit' }
               ], pills: ['4 jumps max', '≤70% effort', 'Legs fresh for Saturday'] }
             ]},
             { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan', drills: [
-                { name: 'LJ with Board — 2 attempts @ 80%', note: 'Hit the board from the new mark; refine if drifting early or late' },
+              { type: 'elite', label: 'AB · Juan · 4 Jumps Max Total', drills: [
+                { name: 'LJ with Board — 2 attempts @ 80%', note: 'Hit the board from the new mark; refine if drifting' },
                 { name: 'TJ with Board — 2 attempts @ 75%', note: 'Controlled speed; confirm mark gives clean board contact' },
-                { name: 'Finalize Mark Card', note: 'Write down starting mark, checkpoint, and board distance for both events — carry this to the meet' }
-              ], pills: ['4 jumps max', '≤80%', 'Marks locked', 'Legs fresh for Saturday'] }
+                { name: 'Finalize Mark Card', note: 'Starting mark · checkpoint · board distance for both events — carry this to the meet' }
+              ], pills: ['4 jumps max', '≤80%', 'Marks locked'] }
+            ]},
+            { title: 'Team Talk — 5 Minutes', blocks: [
+              { type: 'shared', label: 'End of Practice · All Athletes', drills: [
+                { name: 'Each athlete states: their starting mark, their one technical cue, their intention for their first jump', note: 'Say it out loud. Own it. Hear yourself say it before you compete it.' }
+              ]}
+            ]},
+            { title: 'Meet Logistics', blocks: [
+              { type: 'shared', label: 'Communicate before leaving today', drills: [
+                { name: 'Arrival time · warm-up order · flight assignments', note: 'What to eat Saturday morning · spikes check · no surprises on meet day — handle it all Thursday.' }
+              ]}
             ]},
             { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
           ]
@@ -1341,22 +1506,27 @@ const SEED_DATA = {
                 { name: 'Checkpoint Confirmation', note: 'Verify mid-run checkpoint is consistent with Thursday' }
               ], pills: ['Approach only', 'Low intensity'] }
             ]},
-            { title: 'Board Comfort Jumps', blocks: [
-              { type: 'beginner', label: 'Beginner Group', drills: [
-                { name: 'LJ — 2 comfort jumps', note: 'Hit the board, jump, land clean. No pressure. Feel good.' },
-                { name: 'TJ — 1 comfort jump (both-events athletes)', note: 'One smooth run-through of all three phases' }
-              ], pills: ['3 jumps max', 'Confidence only'] }
+            { title: 'Long Jump — All Athletes', blocks: [
+              { type: 'beginner', label: 'All Athletes · LJ · 2 Jumps Hard Cap', drills: [
+                { name: '2 max effort LJ attempts', note: 'Hit the board, attack, land clean. Full effort. This is it for LJ today.' }
+              ], pills: ['2 jumps — no more', 'Max effort'] }
+            ]},
+            { title: 'Triple Jump — Both-Events Athletes', blocks: [
+              { type: 'beginner', label: 'Both-Events Athletes · TJ · 1 Jump Hard Cap', drills: [
+                { name: '1 max effort TJ attempt', note: 'One clean run-through of all three phases. Walk away confident.' },
+                { name: 'No additional TJ jumps — hard cap', note: 'Highest mechanical load of any jump event — protect legs for Saturday' }
+              ], pills: ['1 jump — hard cap', 'Max effort'] }
             ]},
             { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan', drills: [
-                { name: 'LJ — 2 board jumps @ 75%', note: 'Feel fast, hit the mark, project forward — nothing more' },
-                { name: 'TJ — 1 board jump @ 70%', note: 'Clean rhythm, clean contacts, walk away confident' },
+              { type: 'elite', label: 'AB · Juan · 3 Jumps Total', drills: [
+                { name: 'LJ — 2 max effort board jumps', note: 'Feel fast, hit the mark, project forward — preview of Saturday' },
+                { name: 'TJ — 1 max effort board jump', note: 'Clean rhythm, clean contacts, walk away locked in' },
                 { name: 'One final approach-only run', note: 'Last thing you do is nail the approach — leave the track with that feeling' }
-              ], pills: ['3 jumps max', '≤75%', 'Leave something in the tank'] }
+              ], pills: ['3 jumps total', 'Max effort', 'Leave something for Saturday'] }
             ]},
             { title: 'Meet-Day Mindset', blocks: [
               { type: 'shared', label: 'Saturday is execution, not discovery', drills: [
-                { name: 'Every athlete goes to the meet knowing their mark, knowing their rhythm, and trusting what they\'ve built this week.', note: 'The goal is to compete what you\'ve already practiced — not learn anything new on the runway.' }
+                { name: 'Every athlete goes to the meet knowing their mark, their rhythm, and trusting what they\'ve built this week.', note: 'The goal is to compete what you\'ve already practiced — not learn anything new on the runway.' }
               ]}
             ]},
             { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk · Ice Bath' }] }
@@ -1394,7 +1564,18 @@ let currentDayId = null;
 
 async function initApp() {
   const saved = await loadData();
-  APP = saved || JSON.parse(JSON.stringify(SEED_DATA));
+  // If saved data exists but is from an older version, reset to fresh seed
+  if (saved && saved._version !== APP_VERSION) {
+    APP = JSON.parse(JSON.stringify(SEED_DATA));
+    APP._version = APP_VERSION;
+    await saveData(APP);
+  } else if (saved) {
+    APP = saved;
+  } else {
+    APP = JSON.parse(JSON.stringify(SEED_DATA));
+    APP._version = APP_VERSION;
+    await saveData(APP);
+  }
   const vEl = document.getElementById('app-version-label');
   if (vEl) vEl.textContent = APP_VERSION;
   renderHome();
@@ -1428,6 +1609,13 @@ function goWeek() {
   currentDayId = null;
 }
 
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.card-chevron');
+  const isOpen = body.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open', isOpen);
+}
+
 // ══════════════════════════════════════════════
 // RENDER: HOME
 // ══════════════════════════════════════════════
@@ -1436,7 +1624,10 @@ function renderHome() {
   const container = document.getElementById('week-tiles');
   container.innerHTML = '';
 
-  APP.weeks.forEach(week => {
+  // Most recent week at top
+  const sorted = [...APP.weeks].reverse();
+
+  sorted.forEach(week => {
     const tile = document.createElement('div');
     tile.className = 'week-tile';
     tile.onclick = () => openWeek(week.id);
@@ -1445,10 +1636,6 @@ function renderHome() {
       `<div class="day-dot" style="background:${d.color}88"></div>`
     ).join('');
 
-    const meetBadge = week.meet
-      ? `<div class="week-tile-badge" style="background:rgba(224,85,85,0.15);color:#E05555;border:1px solid rgba(224,85,85,0.3);">MEET SAT</div>`
-      : '';
-
     tile.innerHTML = `
       <div class="week-tile-accent" style="background:${week.color}"></div>
       <div class="week-tile-top">
@@ -1456,7 +1643,6 @@ function renderHome() {
           <div class="week-tile-name" style="color:${week.color}">${week.name}</div>
           <div class="week-tile-date">${week.dates}</div>
         </div>
-        ${meetBadge}
       </div>
       <div class="week-tile-days">${dayDots}</div>
       <div class="week-tile-chevron">›</div>
@@ -1472,6 +1658,11 @@ function renderHome() {
 function openWeek(weekId) {
   currentWeekId = weekId;
   const week = APP.weeks.find(w => w.id === weekId);
+  if (!week) { showToast('Week not found'); return; }
+  // Ensure new fields exist for older saved data
+  week.scheduleNotes = week.scheduleNotes || [];
+  week.recovery = week.recovery || [];
+  week.goals = week.goals || [];
   renderWeek(week);
   showScreen('screen-week');
 }
@@ -1500,6 +1691,20 @@ function renderWeek(week) {
 
   // Coaching notes
   document.getElementById('week-coaching-notes').innerHTML = week.coachingNotes || 'No coaching notes yet.';
+
+  // Schedule Notes
+  const schedNotesEl = document.getElementById('week-schedule-notes');
+  const notes = week.scheduleNotes || [];
+  if (notes.length) {
+    schedNotesEl.innerHTML = notes.map(n => `
+      <div class="recovery-row">
+        <span class="recovery-badge ${n.type === 'warn' ? 'warn' : 'info'}">${n.badge}</span>
+        <span class="recovery-text">${n.text}</span>
+      </div>
+    `).join('');
+  } else {
+    schedNotesEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No schedule notes yet.</div>';
+  }
 
   // Meets
   const meetsEl = document.getElementById('week-meets');
@@ -1543,6 +1748,32 @@ function renderWeek(week) {
     rosterEl.appendChild(groupEl);
   });
 
+  // Goals
+  const goalsEl = document.getElementById('week-goals');
+  const goals = week.goals || [];
+  if (goals.length) {
+    goalsEl.innerHTML = '<div class="goals-grid-app">' + goals.map(g => {
+      const isElite = g.group === 'elite';
+      const pillClass = isElite ? 'elite-pill' : 'begin-pill';
+      const dotColor = isElite ? 'var(--elite-light)' : 'var(--beginner-light)';
+      return `
+        <div class="goal-row" onclick="openEditGoalModal('${g.id}')">
+          <div class="goal-row-dot" style="background:${dotColor}"></div>
+          <div class="goal-row-main">
+            <div class="goal-row-name">${g.athleteName}</div>
+            <div class="goal-row-event">${g.events}</div>
+            <div class="goal-row-targets">
+              ${(g.targets || []).map(t => `<span class="goal-target-pill ${pillClass}">${t}</span>`).join('')}
+            </div>
+            <div class="goal-row-cue">${g.cue}</div>
+          </div>
+        </div>
+      `;
+    }).join('') + '</div>';
+  } else {
+    goalsEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No meet goals yet. Tap + Add to create goals for each athlete.</div>';
+  }
+
   // Day tiles
   const tilesEl = document.getElementById('week-day-tiles');
   tilesEl.innerHTML = '';
@@ -1560,6 +1791,20 @@ function renderWeek(week) {
     `;
     tilesEl.appendChild(tile);
   });
+
+  // Recovery
+  const recoveryEl = document.getElementById('week-recovery');
+  const rec = week.recovery || [];
+  if (rec.length) {
+    recoveryEl.innerHTML = rec.map(r => `
+      <div class="recovery-row">
+        <span class="recovery-badge ${r.type === 'warn' ? 'warn' : 'info'}">${r.badge}</span>
+        <span class="recovery-text">${r.text}</span>
+      </div>
+    `).join('');
+  } else {
+    recoveryEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No recovery notes yet.</div>';
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1651,6 +1896,196 @@ function renderSectionBlocks(blocks) {
 
 // ══════════════════════════════════════════════
 // MODALS
+
+// Schedule Notes Modal
+function openEditScheduleNotesModal() {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const notes = week.scheduleNotes || [];
+  openModal(`
+    <div class="modal-title">Schedule Notes <button class="modal-close" onclick="closeModalDirect()">×</button></div>
+    <div class="modal-field">
+      <div class="modal-label">Badge</div>
+      <input class="modal-input" id="sn-badge" placeholder="e.g. MON, FRI, LJ ONLY">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Type</div>
+      <select class="modal-select" id="sn-type">
+        <option value="info">Info (silver)</option>
+        <option value="warn">Warning (orange)</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Note</div>
+      <input class="modal-input" id="sn-text" placeholder="Note text">
+    </div>
+    <button class="modal-btn" onclick="addScheduleNote()">Add Note</button>
+    <div style="margin-top:20px;">
+      <div class="modal-label" style="margin-bottom:10px;">Current Notes</div>
+      <div id="sn-list">
+        ${notes.map((n, i) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="flex:1;font-size:12px;"><strong>${n.badge}</strong> — ${n.text}</div>
+            <div style="color:var(--optional);cursor:pointer;" onclick="deleteScheduleNote(${i})">✕</div>
+          </div>
+        `).join('') || '<div style="color:var(--muted);font-size:12px;">No notes yet</div>'}
+      </div>
+    </div>
+  `);
+}
+
+function addScheduleNote() {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const badge = document.getElementById('sn-badge').value.trim().toUpperCase();
+  const text = document.getElementById('sn-text').value.trim();
+  if (!badge || !text) { showToast('Enter badge and note'); return; }
+  week.scheduleNotes = week.scheduleNotes || [];
+  week.scheduleNotes.push({ badge, type: document.getElementById('sn-type').value, text });
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast('Note added');
+}
+
+function deleteScheduleNote(index) {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  week.scheduleNotes.splice(index, 1);
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast('Note removed');
+}
+
+// Recovery Modal
+function openEditRecoveryModal() {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const rec = week.recovery || [];
+  openModal(`
+    <div class="modal-title">Recovery Guidance <button class="modal-close" onclick="closeModalDirect()">×</button></div>
+    <div class="modal-field">
+      <div class="modal-label">Badge</div>
+      <input class="modal-input" id="rec-badge" placeholder="e.g. SLEEP, HYDRATION">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Type</div>
+      <select class="modal-select" id="rec-type">
+        <option value="info">Info (silver)</option>
+        <option value="warn">Warning (orange)</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Guidance</div>
+      <input class="modal-input" id="rec-text" placeholder="Recovery note text">
+    </div>
+    <button class="modal-btn" onclick="addRecoveryNote()">Add Note</button>
+    <div style="margin-top:20px;">
+      <div class="modal-label" style="margin-bottom:10px;">Current Notes</div>
+      <div id="rec-list">
+        ${rec.map((r, i) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="flex:1;font-size:12px;"><strong>${r.badge}</strong> — ${r.text}</div>
+            <div style="color:var(--optional);cursor:pointer;" onclick="deleteRecoveryNote(${i})">✕</div>
+          </div>
+        `).join('') || '<div style="color:var(--muted);font-size:12px;">No notes yet</div>'}
+      </div>
+    </div>
+  `);
+}
+
+function addRecoveryNote() {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const badge = document.getElementById('rec-badge').value.trim().toUpperCase();
+  const text = document.getElementById('rec-text').value.trim();
+  if (!badge || !text) { showToast('Enter badge and note'); return; }
+  week.recovery = week.recovery || [];
+  week.recovery.push({ badge, type: document.getElementById('rec-type').value, text });
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast('Recovery note added');
+}
+
+function deleteRecoveryNote(index) {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  week.recovery.splice(index, 1);
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast('Note removed');
+}
+
+// Goals Modal
+function openEditGoalModal(goalId) {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const goal = goalId ? (week.goals || []).find(g => g.id === goalId) : null;
+  const isNew = !goal;
+  openModal(`
+    <div class="modal-title">${isNew ? 'Add Goal' : 'Edit Goal'} <button class="modal-close" onclick="closeModalDirect()">×</button></div>
+    <div class="modal-field">
+      <div class="modal-label">Athlete Name</div>
+      <input class="modal-input" id="eg-name" value="${goal?.athleteName || ''}" placeholder="Athlete name">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Group</div>
+      <select class="modal-select" id="eg-group">
+        <option value="elite" ${goal?.group === 'elite' ? 'selected' : ''}>Elite</option>
+        <option value="beginner" ${goal?.group !== 'elite' ? 'selected' : ''}>Beginner</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Events</div>
+      <input class="modal-input" id="eg-events" value="${goal?.events || ''}" placeholder="LJ · TJ">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Targets (comma separated)</div>
+      <input class="modal-input" id="eg-targets" value="${(goal?.targets || []).join(', ')}" placeholder="LJ 18'0\"+ PR, TJ 33'0\"+ PR">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Intent Cue</div>
+      <textarea class="modal-textarea" id="eg-cue" style="min-height:80px;">${goal?.cue || ''}</textarea>
+    </div>
+    <button class="modal-btn" onclick="saveGoal('${goalId || ''}')">Save</button>
+    ${!isNew ? `<button class="modal-btn modal-btn-danger" onclick="deleteGoal('${goalId}')">Remove Goal</button>` : ''}
+  `);
+}
+
+function saveGoal(goalId) {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  const name = document.getElementById('eg-name').value.trim();
+  if (!name) { showToast('Enter athlete name'); return; }
+  const targets = document.getElementById('eg-targets').value.split(',').map(t => t.trim()).filter(Boolean);
+  week.goals = week.goals || [];
+  if (goalId) {
+    const g = week.goals.find(g => g.id === goalId);
+    g.athleteName = name;
+    g.group = document.getElementById('eg-group').value;
+    g.events = document.getElementById('eg-events').value.trim();
+    g.targets = targets;
+    g.cue = document.getElementById('eg-cue').value.trim();
+  } else {
+    week.goals.push({
+      id: 'g-' + Date.now(),
+      athleteName: name,
+      group: document.getElementById('eg-group').value,
+      events: document.getElementById('eg-events').value.trim(),
+      targets,
+      cue: document.getElementById('eg-cue').value.trim()
+    });
+  }
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast(goalId ? 'Goal updated' : 'Goal added');
+}
+
+function deleteGoal(goalId) {
+  const week = APP.weeks.find(w => w.id === currentWeekId);
+  week.goals = week.goals.filter(g => g.id !== goalId);
+  saveData(APP);
+  closeModalDirect();
+  renderWeek(week);
+  showToast('Goal removed');
+}
+
 // ══════════════════════════════════════════════
 
 function openModal(html) {
@@ -2096,6 +2531,9 @@ const _openEditMeetsModal = openEditMeetsModal;
 const _openEditAthleteModal = openEditAthleteModal;
 const _openAddDayModal    = openAddDayModal;
 const _openEditDayModal   = openEditDayModal;
+const _openEditScheduleNotesModal = openEditScheduleNotesModal;
+const _openEditRecoveryModal = openEditRecoveryModal;
+const _openEditGoalModal  = openEditGoalModal;
 
 openAddWeekModal    = () => requireAuth(_openAddWeekModal);
 openEditWeekModal   = () => requireAuth(_openEditWeekModal);
@@ -2104,6 +2542,9 @@ openEditMeetsModal  = () => requireAuth(_openEditMeetsModal);
 openEditAthleteModal = (id) => requireAuth(() => _openEditAthleteModal(id));
 openAddDayModal     = () => requireAuth(_openAddDayModal);
 openEditDayModal    = () => requireAuth(_openEditDayModal);
+openEditScheduleNotesModal = () => requireAuth(_openEditScheduleNotesModal);
+openEditRecoveryModal = () => requireAuth(_openEditRecoveryModal);
+openEditGoalModal   = (id) => requireAuth(() => _openEditGoalModal(id));
 
 // ══════════════════════════════════════════════
 // INIT

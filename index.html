@@ -328,8 +328,6 @@ html, body {
   background: rgba(255,255,255,0.05);
 }
 
-.card-body { padding: 14px 16px; }
-
 /* Intensity Overview */
 .intensity-grid {
   display: flex;
@@ -1109,7 +1107,7 @@ html, body {
 // ══════════════════════════════════════════════
 // VERSION
 // ══════════════════════════════════════════════
-const APP_VERSION = 'v1.7';
+const APP_VERSION = 'v2.0';
 
 // ══════════════════════════════════════════════
 // DATA SEED
@@ -1563,17 +1561,24 @@ let currentWeekId = null;
 let currentDayId = null;
 
 async function initApp() {
+  // Force clear any stale data — fresh seed on every version bump
+  const storedVersion = localStorage.getItem('jump-planner-version');
+  if (storedVersion !== APP_VERSION) {
+    localStorage.removeItem('jump-planner-data');
+    localStorage.setItem('jump-planner-version', APP_VERSION);
+  }
   const saved = await loadData();
-  // If saved data exists but is from an older version, reset to fresh seed
-  if (saved && saved._version !== APP_VERSION) {
-    APP = JSON.parse(JSON.stringify(SEED_DATA));
-    APP._version = APP_VERSION;
-    await saveData(APP);
-  } else if (saved) {
+  if (saved) {
+    // Patch any missing fields on existing weeks
+    saved.weeks = saved.weeks.map(w => ({
+      scheduleNotes: [],
+      recovery: [],
+      goals: [],
+      ...w
+    }));
     APP = saved;
   } else {
     APP = JSON.parse(JSON.stringify(SEED_DATA));
-    APP._version = APP_VERSION;
     await saveData(APP);
   }
   const vEl = document.getElementById('app-version-label');
@@ -1656,18 +1661,26 @@ function renderHome() {
 // ══════════════════════════════════════════════
 
 function openWeek(weekId) {
-  currentWeekId = weekId;
-  const week = APP.weeks.find(w => w.id === weekId);
-  if (!week) { showToast('Week not found'); return; }
-  // Ensure new fields exist for older saved data
-  week.scheduleNotes = week.scheduleNotes || [];
-  week.recovery = week.recovery || [];
-  week.goals = week.goals || [];
-  renderWeek(week);
-  showScreen('screen-week');
+  try {
+    currentWeekId = weekId;
+    const week = APP.weeks.find(w => w.id === weekId);
+    if (!week) { showToast('Week not found'); return; }
+    week.scheduleNotes = week.scheduleNotes || [];
+    week.recovery = week.recovery || [];
+    week.goals = week.goals || [];
+    week.athletes = week.athletes || [];
+    week.meets = week.meets || [];
+    week.days = week.days || [];
+    renderWeek(week);
+    showScreen('screen-week');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+    console.error('openWeek error:', e);
+  }
 }
 
 function renderWeek(week) {
+  try {
   document.getElementById('week-nav-title').textContent = week.name.toUpperCase();
   document.getElementById('week-hero-label').textContent = week.label || 'Practice Week';
   document.getElementById('week-hero-title').textContent = week.name;
@@ -1805,6 +1818,10 @@ function renderWeek(week) {
   } else {
     recoveryEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No recovery notes yet.</div>';
   }
+  } catch(e) {
+    showToast('Render error: ' + e.message);
+    console.error('renderWeek error:', e);
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1899,6 +1916,7 @@ function renderSectionBlocks(blocks) {
 
 // Schedule Notes Modal
 function openEditScheduleNotesModal() {
+  if (!sessionUnlocked) { requireAuth(openEditScheduleNotesModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const notes = week.scheduleNotes || [];
   openModal(`
@@ -1957,6 +1975,7 @@ function deleteScheduleNote(index) {
 
 // Recovery Modal
 function openEditRecoveryModal() {
+  if (!sessionUnlocked) { requireAuth(openEditRecoveryModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const rec = week.recovery || [];
   openModal(`
@@ -2015,6 +2034,7 @@ function deleteRecoveryNote(index) {
 
 // Goals Modal
 function openEditGoalModal(goalId) {
+  if (!sessionUnlocked) { requireAuth(() => openEditGoalModal(goalId)); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const goal = goalId ? (week.goals || []).find(g => g.id === goalId) : null;
   const isNew = !goal;
@@ -2104,6 +2124,7 @@ function closeModalDirect() {
 
 // Add Week
 function openAddWeekModal() {
+  if (!sessionUnlocked) { requireAuth(openAddWeekModal); return; }
   openModal(`
     <div class="modal-title">New Week <button class="modal-close" onclick="closeModalDirect()">×</button></div>
     <div class="modal-field">
@@ -2154,6 +2175,7 @@ function saveNewWeek() {
 
 // Edit Week
 function openEditWeekModal() {
+  if (!sessionUnlocked) { requireAuth(openEditWeekModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   openModal(`
     <div class="modal-title">Edit Week <button class="modal-close" onclick="closeModalDirect()">×</button></div>
@@ -2207,6 +2229,7 @@ function deleteWeek() {
 
 // Edit Notes
 function openEditNotesModal() {
+  if (!sessionUnlocked) { requireAuth(openEditNotesModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   openModal(`
     <div class="modal-title">Coaching Notes <button class="modal-close" onclick="closeModalDirect()">×</button></div>
@@ -2229,6 +2252,7 @@ function saveNotes() {
 
 // Edit Meets
 function openEditMeetsModal() {
+  if (!sessionUnlocked) { requireAuth(openEditMeetsModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const meetsJSON = JSON.stringify(week.meets || [], null, 2);
   openModal(`
@@ -2285,6 +2309,7 @@ function deleteMeet(index) {
 
 // Athlete Modal
 function openEditAthleteModal(athleteId) {
+  if (!sessionUnlocked) { requireAuth(() => openEditAthleteModal(athleteId)); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const athlete = athleteId ? week.athletes.find(a => a.id === athleteId) : null;
   const isNew = !athlete;
@@ -2352,6 +2377,7 @@ function deleteAthlete(athleteId) {
 
 // Add Day
 function openAddDayModal() {
+  if (!sessionUnlocked) { requireAuth(openAddDayModal); return; }
   openModal(`
     <div class="modal-title">Add Day <button class="modal-close" onclick="closeModalDirect()">×</button></div>
     <div class="modal-field">
@@ -2405,6 +2431,7 @@ function saveNewDay() {
 
 // Edit Day
 function openEditDayModal() {
+  if (!sessionUnlocked) { requireAuth(openEditDayModal); return; }
   const week = APP.weeks.find(w => w.id === currentWeekId);
   const day = week.days.find(d => d.id === currentDayId);
   openModal(`
@@ -2523,28 +2550,13 @@ function submitAuth() {
   }
 }
 
-// Wrap all edit-triggering functions with auth gate
-const _openAddWeekModal   = openAddWeekModal;
-const _openEditWeekModal  = openEditWeekModal;
-const _openEditNotesModal = openEditNotesModal;
-const _openEditMeetsModal = openEditMeetsModal;
-const _openEditAthleteModal = openEditAthleteModal;
-const _openAddDayModal    = openAddDayModal;
-const _openEditDayModal   = openEditDayModal;
-const _openEditScheduleNotesModal = openEditScheduleNotesModal;
-const _openEditRecoveryModal = openEditRecoveryModal;
-const _openEditGoalModal  = openEditGoalModal;
+// ══════════════════════════════════════════════
+// AUTH GATE — wraps all edit actions
+// ══════════════════════════════════════════════
 
-openAddWeekModal    = () => requireAuth(_openAddWeekModal);
-openEditWeekModal   = () => requireAuth(_openEditWeekModal);
-openEditNotesModal  = () => requireAuth(_openEditNotesModal);
-openEditMeetsModal  = () => requireAuth(_openEditMeetsModal);
-openEditAthleteModal = (id) => requireAuth(() => _openEditAthleteModal(id));
-openAddDayModal     = () => requireAuth(_openAddDayModal);
-openEditDayModal    = () => requireAuth(_openEditDayModal);
-openEditScheduleNotesModal = () => requireAuth(_openEditScheduleNotesModal);
-openEditRecoveryModal = () => requireAuth(_openEditRecoveryModal);
-openEditGoalModal   = (id) => requireAuth(() => _openEditGoalModal(id));
+function authGate(callback) {
+  requireAuth(callback);
+}
 
 // ══════════════════════════════════════════════
 // INIT

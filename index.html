@@ -5,2569 +5,429 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0D1B2A">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Jump Practice Planner</title>
+<title>A Jaguar's Horizontal Jumps Plan</title>
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --sky: #0D1B2A;
-  --sky-mid: #152336;
-  --sky-light: #1E3450;
-  --silver: #8A8A9A;
-  --silver-light: #B0B0C4;
-  --white: #F5F0E8;
-  --muted: #F5F0E8;
-  --beginner: #3A7CA5;
-  --beginner-light: #5BA3CC;
-  --elite: #C75B7A;
-  --elite-light: #E87A98;
-  --optional: #E05555;
-  --green: #7DB860;
-  --orange: #E87A5A;
-  --blue: #7BC8F5;
-  --lime: #A8D878;
-  --radius: 10px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-html, body {
-  height: 100%;
-  background: var(--sky);
-  color: var(--white);
-  font-family: 'DM Sans', sans-serif;
-  overflow: hidden;
-}
-
-/* ── SCREENS ── */
-.screen {
-  position: fixed;
-  inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: var(--sky);
-  transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s ease;
-  padding-bottom: calc(20px + var(--safe-bottom));
-  -webkit-overflow-scrolling: touch;
-}
-
-.screen.hidden        { transform: translateX(100%); opacity: 0; pointer-events: none; }
-.screen.slide-left    { transform: translateX(-40%); opacity: 0; pointer-events: none; }
-
-/* ── NAV BAR ── */
-.nav-bar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 20px 12px;
-  position: sticky;
-  top: 0;
-  background: var(--sky);
-  z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.nav-back {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0;
-  font-size: 18px; color: var(--white);
-}
-
-.nav-title {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--silver-light);
-  flex: 1;
-}
-
-.nav-action {
-  padding: 7px 14px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  font-size: 12px;
-  color: var(--white);
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  white-space: nowrap;
-}
-
-.nav-action:active { opacity: 0.7; }
-
-/* ── HOME SCREEN ── */
-.home-header {
-  padding: 36px 20px 24px;
-  position: relative;
-  overflow: hidden;
-  border-bottom: 2px solid var(--silver);
-}
-
-.home-header::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(176,176,196,0.04) 60px, rgba(176,176,196,0.04) 61px);
-  pointer-events: none;
-}
-
-.home-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 4px;
-  color: var(--silver-light);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-
-.home-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 56px;
-  line-height: 0.88;
-  color: var(--white);
-}
-
-.home-title span { color: var(--silver-light); display: block; }
-
-.home-sub {
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 300;
-}
-
-.weeks-grid {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.weeks-section-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
-  padding: 0 2px;
-}
-
-.week-tile {
-  background: var(--sky-mid);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  cursor: pointer;
-  transition: background 0.18s, border-color 0.18s, transform 0.12s;
-  position: relative;
-  overflow: hidden;
-}
-
-.week-tile:active { transform: scale(0.98); }
-.week-tile:hover  { background: var(--sky-light); border-color: rgba(255,255,255,0.15); }
-
-.week-tile-accent {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  border-radius: var(--radius) 0 0 var(--radius);
-}
-
-.week-tile-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
-.week-tile-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
-  letter-spacing: 1px;
-  line-height: 1;
-}
-
-.week-tile-date {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.week-tile-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 1px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-
-.week-tile-days {
-  display: flex;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.day-dot {
-  flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.1);
-}
-
-.week-tile-chevron {
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 18px;
-}
-
-.add-week-btn {
-  margin: 4px 20px 0;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 1px dashed rgba(255,255,255,0.15);
-  background: transparent;
-  color: var(--muted);
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: calc(100% - 40px);
-  transition: border-color 0.18s, color 0.18s;
-}
-
-.add-week-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
-
-/* ── WEEK SCREEN ── */
-.week-hero {
-  padding: 28px 20px 20px;
-  border-bottom: 2px solid rgba(255,255,255,0.08);
-  position: relative;
-  overflow: hidden;
-}
-
-.week-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(176,176,196,0.03) 60px, rgba(176,176,196,0.03) 61px);
-}
-
-.week-hero-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--silver-light);
-  margin-bottom: 8px;
-}
-
-.week-hero-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 46px;
-  line-height: 0.9;
-}
-
-.week-hero-date {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 300;
-}
-
-.week-content {
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Cards */
-.card {
-  background: var(--sky-mid);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.card-header {
-  padding: 12px 16px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.card-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.card-edit {
-  font-size: 11px;
-  color: var(--silver-light);
-  cursor: pointer;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(255,255,255,0.05);
-}
-
-/* Intensity Overview */
-.intensity-grid {
-  display: flex;
-  gap: 8px;
-}
-
-.int-day {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.int-day-name {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 1px;
-  color: var(--muted);
-  text-transform: uppercase;
-}
-
-.int-day-bar-track {
-  width: 100%;
-  height: 60px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-}
-
-.int-day-bar-fill {
-  width: 100%;
-  border-radius: 4px;
-  transition: height 0.5s ease;
-}
-
-.int-day-pct {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-}
-
-/* Roster */
-.roster-group { margin-bottom: 12px; }
-.roster-group:last-child { margin-bottom: 0; }
-
-.roster-group-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-
-.athlete-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  cursor: pointer;
-}
-
-.athlete-row:last-child { border-bottom: none; }
-
-.athlete-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.athlete-name {
-  font-size: 13px;
-  font-weight: 500;
-  flex: 1;
-}
-
-.athlete-marks {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  color: var(--muted);
-  text-align: right;
-}
-
-.athlete-marks span {
-  display: block;
-  line-height: 1.5;
-}
-
-/* Meets */
-.meet-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.meet-row:last-child { border-bottom: none; }
-
-.meet-badge {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  padding: 3px 7px;
-  border-radius: 3px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.meet-text { font-size: 12px; font-weight: 300; line-height: 1.5; }
-.meet-text strong { font-weight: 600; color: var(--white); }
-
-/* Notes */
-.notes-text {
-  font-size: 12px;
-  color: rgba(245,240,232,0.7);
-  line-height: 1.8;
-  font-weight: 300;
-}
-
-.notes-text strong { color: var(--white); font-weight: 600; }
-
-/* Day tiles */
-.days-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.day-tile {
-  background: var(--sky-mid);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: var(--radius);
-  padding: 16px;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  position: relative;
-  overflow: hidden;
-}
-
-.day-tile:active { transform: scale(0.97); }
-.day-tile:hover { background: var(--sky-light); }
-
-.day-tile-accent {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-}
-
-.day-tile-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 1px;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.day-tile-focus {
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.day-tile-int {
-  height: 3px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 4px;
-}
-
-.day-tile-int-fill { height: 100%; border-radius: 2px; }
-
-.day-tile-int-pct {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  color: var(--muted);
-}
-
-.day-tile-tag {
-  position: absolute;
-  top: 10px; right: 10px;
-  font-family: 'DM Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 1px;
-  padding: 2px 6px;
-  border-radius: 3px;
-  text-transform: uppercase;
-}
-
-/* ── DAY SCREEN ── */
-.day-hero {
-  padding: 24px 20px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-
-.day-hero-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.day-hero-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 52px;
-  line-height: 0.9;
-  margin-bottom: 6px;
-}
-
-.day-hero-focus {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-
-.day-int-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.day-int-track {
-  flex: 1; height: 4px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px; overflow: hidden;
-}
-
-.day-int-fill { height: 100%; border-radius: 2px; }
-.day-int-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
-.day-int-pct   { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
-
-.day-sections {
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.section-card {
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.section-card-header {
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255,255,255,0.04);
-  cursor: pointer;
-}
-
-.section-card-title {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.section-card-chevron {
-  font-size: 12px;
-  color: var(--muted);
-  transition: transform 0.2s;
-}
-
-.section-card-chevron.open { transform: rotate(90deg); }
-
-.section-card-body {
-  display: none;
-  padding: 14px;
-}
-
-.section-card-body.open { display: block; }
-
-/* Blocks inside day */
-.practice-block {
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  border: 1px solid transparent;
-}
-
-.practice-block:last-child { margin-bottom: 0; }
-.practice-block.shared   { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.09); }
-.practice-block.beginner { background: rgba(58,124,165,0.08);  border-color: rgba(58,124,165,0.22); }
-.practice-block.elite    { background: rgba(199,91,122,0.08);  border-color: rgba(199,91,122,0.22); }
-.practice-block.lift     { background: rgba(45,80,22,0.2);     border-color: rgba(61,107,31,0.35); }
-.practice-block.warmup   { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08); }
-
-.block-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.shared .block-label   { color: var(--muted); }
-.beginner .block-label { color: var(--beginner-light); }
-.elite .block-label    { color: var(--elite-light); }
-.lift .block-label     { color: var(--green); }
-.warmup .block-label   { color: var(--muted); }
-
-.drill-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-
-.drill-list li {
-  font-size: 13px;
-  line-height: 1.45;
-  color: rgba(245,240,232,0.83);
-  padding-left: 14px;
-  position: relative;
-  font-weight: 300;
-}
-
-.drill-list li::before {
-  content: '→';
-  position: absolute; left: 0; top: 2px;
-  font-size: 10px; color: var(--muted);
-}
-
-.drill-list li strong { font-weight: 600; color: var(--white); }
-
-.drill-list li em {
-  font-style: normal;
-  font-size: 11px;
-  color: var(--muted);
-  display: block;
-  margin-top: 1px;
-}
-
-.vol-row {
-  display: flex; gap: 5px; flex-wrap: wrap;
-  margin-top: 10px; padding-top: 9px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-.vol-pill {
-  font-family: 'DM Mono', monospace;
-  font-size: 9px;
-  padding: 2px 7px;
-  border-radius: 3px;
-  letter-spacing: 1px;
-}
-
-.beginner .vol-pill { background: rgba(58,124,165,0.18);  color: var(--beginner-light); }
-.elite .vol-pill    { background: rgba(199,91,122,0.18);  color: var(--elite-light); }
-.shared .vol-pill   { background: rgba(255,255,255,0.07); color: var(--muted); }
-.lift .vol-pill     { background: rgba(45,80,22,0.4);     color: var(--green); }
-
-.opt-text { color: var(--optional); font-style: italic; font-size: 12px; }
-
-.warmup-text {
-  font-size: 12px;
-  color: rgba(245,240,232,0.65);
-  line-height: 1.8;
-  font-weight: 300;
-}
-
-/* Mindset block */
-.mindset-block {
-  background: rgba(199,91,122,0.06);
-  border: 1px solid rgba(199,91,122,0.2);
-  border-radius: 8px;
-  padding: 14px;
-  font-size: 12px;
-  color: rgba(245,240,232,0.75);
-  line-height: 1.8;
-}
-
-.mindset-block strong { color: var(--white); font-weight: 600; }
-
-/* ── MODALS ── */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  display: flex; align-items: flex-end;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
-}
-
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-
-.modal {
-  background: #1A2C3F;
-  border-radius: 16px 16px 0 0;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: 24px 20px calc(24px + var(--safe-bottom));
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-}
-
-.modal-overlay.open .modal { transform: translateY(0); }
-
-.modal-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-close {
-  font-size: 22px;
-  cursor: pointer;
-  color: var(--muted);
-  background: none;
-  border: none;
-  color: var(--muted);
-}
-
-.modal-field { margin-bottom: 16px; }
-
-.modal-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.modal-input, .modal-textarea, .modal-select {
-  width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  padding: 12px 14px;
-  color: var(--white);
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  outline: none;
-}
-
-.modal-input:focus, .modal-textarea:focus, .modal-select:focus {
-  border-color: var(--silver-light);
-}
-
-.modal-textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
-.modal-select option { background: #1A2C3F; }
-
-.modal-btn {
-  width: 100%;
-  padding: 15px;
-  border-radius: 10px;
-  background: var(--silver-light);
-  color: var(--sky);
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  margin-top: 8px;
-}
-
-.modal-btn-danger {
-  background: rgba(224,85,85,0.15);
-  color: var(--optional);
-  border: 1px solid rgba(224,85,85,0.3);
-  margin-top: 8px;
-}
-
-.modal-btn:active { opacity: 0.8; }
-
-/* ── TOASTS ── */
-.toast {
-  position: fixed;
-  bottom: calc(20px + var(--safe-bottom));
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: rgba(30,52,80,0.95);
-  border: 1px solid rgba(176,176,196,0.3);
-  padding: 10px 18px;
-  border-radius: 30px;
-  font-size: 12px;
-  font-family: 'DM Mono', monospace;
-  letter-spacing: 1px;
-  color: var(--white);
-  z-index: 300;
-  transition: transform 0.3s ease;
-  white-space: nowrap;
-}
-
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-/* White + black outline for all muted-color text elements */
-.home-sub, .home-label, .nav-title, .week-tile-date, .weeks-section-label,
-.day-focus, .day-tile-focus, .day-tile-int-pct, .day-int-label, .day-int-pct,
-.int-day-name, .int-day-pct, .card-label, .roster-group-label, .section-label,
-.section-card-title, .block-label, .vol-pill, .wc-title, .modal-label,
-.athlete-marks, .int-label, .int-pct, .week-tile-chevron,
-.day-hero-focus, .day-hero-label, .week-hero-label, .week-hero-date,
-.weeks-section-label, .note-card-label, .coaching-box-label,
-.add-week-btn, .card-edit, .nav-action, .day-tile-tag {
-  text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
-}
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.06);
-  margin: 4px 0;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 300;
-}
-
-/* ── GOALS TILE ── */
-.goals-grid-app { display: flex; flex-direction: column; gap: 0; }
-
-.goal-row {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.goal-row:last-child { border-bottom: none; }
-.goal-row-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-.goal-row-main { flex: 1; }
-.goal-row-name { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
-.goal-row-event { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-bottom: 5px; }
-.goal-row-targets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
-.goal-target-pill { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; }
-.goal-target-pill.elite-pill { background: rgba(199,91,122,0.15); color: var(--elite-light); border: 1px solid rgba(199,91,122,0.3); }
-.goal-target-pill.begin-pill { background: rgba(58,124,165,0.15); color: var(--beginner-light); border: 1px solid rgba(58,124,165,0.3); }
-.goal-row-cue { font-size: 11px; color: rgba(245,240,232,0.5); font-style: italic; line-height: 1.5; }
-
-/* ── COLLAPSIBLE CARDS ── */
-.card-header {
-  cursor: pointer;
-  user-select: none;
-}
-
-.card-chevron {
-  font-size: 16px;
-  color: var(--muted);
-  transition: transform 0.22s ease;
-  flex-shrink: 0;
-  margin-left: 8px;
-}
-
-.card-chevron.open { transform: rotate(90deg); }
-
-.card-body {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  padding: 0 16px;
-}
-
-.card-body.open {
-  max-height: 2000px;
-  padding: 14px 16px;
-}
-
-/* Day tiles section — not a card, always visible */
-.days-section-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 4px 2px;
-}
-
-.recovery-row { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.recovery-row:last-child { border-bottom: none; }
-.recovery-badge { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 2px 7px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
-.recovery-badge.warn { color: rgba(232,122,90,0.9); background: rgba(232,122,90,0.1); border: 1px solid rgba(232,122,90,0.25); }
-.recovery-badge.info { color: var(--silver-light); background: rgba(176,176,196,0.1); border: 1px solid rgba(176,176,196,0.25); }
-.recovery-text { font-size: 12px; font-weight: 300; color: rgba(245,240,232,0.65); line-height: 1.5; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0D1B2A;color:#F5F0E8;font-family:'DM Sans',sans-serif;overflow:hidden}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;background:#0D1B2A;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s ease}
+.screen.off{transform:translateX(100%);opacity:0;pointer-events:none}
+
+/* NAV */
+.nav{display:flex;align-items:center;gap:12px;padding:14px 20px 12px;position:sticky;top:0;z-index:50;background:#0D1B2A;border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-back{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:#F5F0E8;flex-shrink:0}
+.nav-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8;flex:1}
+.nav-btn{padding:7px 13px;border-radius:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-size:12px;color:#F5F0E8;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* HOME */
+.home-header{padding:36px 20px 22px;border-bottom:2px solid #8A8A9A;position:relative;overflow:hidden}
+.home-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(176,176,196,.04) 80px,rgba(176,176,196,.04) 81px);pointer-events:none}
+.logo-row{display:flex;align-items:center;gap:18px;margin-bottom:10px}
+.home-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#F5F0E8;margin-bottom:7px}
+.home-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,8vw,56px);line-height:.9;color:#F5F0E8}
+.home-title span{color:#F5F0E8;display:block}
+.home-ver{margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(160,152,128,.5)}
+.weeks-list{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.weeks-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8;margin-bottom:2px}
+.week-tile{background:#152336;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:15px 44px 15px 16px;cursor:pointer;position:relative;overflow:hidden;transition:background .15s}
+.week-tile:active{background:#1E3450}
+.w-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px}
+.w-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;line-height:1;margin-bottom:3px}
+.w-date{font-family:'DM Mono',monospace;font-size:10px;color:#F5F0E8;margin-bottom:8px}
+.w-dots{display:flex;gap:5px}
+.w-dot{flex:1;height:4px;border-radius:2px}
+.w-chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:20px;color:#F5F0E8}
+.add-btn{margin:2px 20px 20px;width:calc(100% - 40px);padding:14px;border-radius:10px;border:1px dashed rgba(255,255,255,.15);background:transparent;color:#F5F0E8;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;display:block}
+
+/* WEEK */
+.week-hero{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.wh-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#F5F0E8;margin-bottom:7px}
+.wh-name{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:.9;color:#F5F0E8;margin-bottom:7px}
+.wh-date{font-size:12px;color:#F5F0E8;font-weight:300}
+.week-body{padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.sec-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8;padding:2px}
+
+/* COLLAPSIBLE CARD */
+.ccard{background:#152336;border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
+.ccard-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none}
+.ccard-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8}
+.ccard-right{display:flex;align-items:center;gap:8px}
+.ccard-edit{font-size:11px;color:#F5F0E8;cursor:pointer;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.05)}
+.ccard-chev{font-size:16px;color:#F5F0E8;transition:transform .22s;line-height:1}
+.ccard-chev.open{transform:rotate(90deg)}
+.ccard-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.ccard-body.open{max-height:4000px}
+.ccard-inner{padding:12px 14px}
+
+/* WEEK CONTENT */
+.int-grid{display:flex;gap:8px}
+.int-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.int-col-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#F5F0E8}
+.int-track{width:100%;height:52px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end}
+.int-fill{width:100%;border-radius:4px}
+.int-pct{font-family:'DM Mono',monospace;font-size:9px;color:#F5F0E8}
+.meet-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.meet-row:last-child{border-bottom:none}
+.meet-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;white-space:nowrap;background:rgba(176,176,196,.1);color:#F5F0E8;border:1px solid rgba(176,176,196,.25)}
+.meet-txt{font-size:12px;font-weight:300;color:rgba(245,240,232,.8);line-height:1.5}
+.meet-txt strong{font-weight:600;color:#F5F0E8}
+.rg-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#F5F0E8;margin:8px 0 5px}
+.ath-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.ath-row:last-child{border-bottom:none}
+.ath-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ath-name{font-size:13px;font-weight:500;flex:1}
+.ath-marks{text-align:right}
+.ath-ev{font-family:'DM Mono',monospace;font-size:9px;color:#F5F0E8;display:block}
+.ath-mk{font-family:'DM Mono',monospace;font-size:10px;color:#F5F0E8;display:block}
+.goal-row{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.goal-row:last-child{border-bottom:none}
+.goal-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.goal-name{font-size:13px;font-weight:600;color:#F5F0E8;margin-bottom:2px}
+.goal-ev{font-family:'DM Mono',monospace;font-size:9px;color:#F5F0E8;letter-spacing:1px;margin-bottom:4px}
+.goal-tgts{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+.gp{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px}
+.gp.e{background:rgba(199,91,122,.15);color:#E87A98;border:1px solid rgba(199,91,122,.3)}
+.gp.b{background:rgba(58,124,165,.15);color:#5BA3CC;border:1px solid rgba(58,124,165,.3)}
+.goal-cue{font-size:11px;color:rgba(245,240,232,.75);font-style:italic;line-height:1.5;border-left:2px solid rgba(255,255,255,.1);padding-left:8px}
+.note-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.note-row:last-child{border-bottom:none}
+.note-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.note-badge.info{background:rgba(176,176,196,.1);color:#F5F0E8;border:1px solid rgba(176,176,196,.25)}
+.note-badge.warn{background:rgba(232,122,90,.1);color:#E87A5A;border:1px solid rgba(232,122,90,.25)}
+.note-txt{font-size:12px;font-weight:300;color:rgba(245,240,232,.9);line-height:1.5}
+
+/* DAY TILES */
+.day-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.day-tile{background:#152336;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px;cursor:pointer;position:relative;overflow:hidden;transition:background .15s}
+.day-tile:active{background:#1E3450}
+.dt-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px}
+.dt-tag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:5px}
+.dt-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;line-height:1;margin-bottom:3px}
+.dt-focus{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#F5F0E8;margin-bottom:9px;line-height:1.4}
+.dt-int{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:3px}
+.dt-int-fill{height:100%;border-radius:2px}
+.dt-pct{font-family:'DM Mono',monospace;font-size:9px;color:#F5F0E8}
+
+/* DAY SCREEN */
+.day-hero{padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.dh-ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8;margin-bottom:5px}
+.dh-name{font-family:'Bebas Neue',sans-serif;font-size:50px;line-height:.9;margin-bottom:5px}
+.dh-focus{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#F5F0E8;margin-bottom:10px}
+.dh-int{display:flex;align-items:center;gap:10px}
+.dh-int-lbl,.dh-int-pct{font-family:'DM Mono',monospace;font-size:10px;color:#F5F0E8}
+.dh-int-track{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.dh-int-fill{height:100%;border-radius:2px}
+.day-body{padding:14px 20px;display:flex;flex-direction:column;gap:12px}
+.sec-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sec-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#F5F0E8}
+.sec-line{flex:1;height:1px;background:rgba(255,255,255,.07)}
+.pblock{border-radius:8px;padding:12px;margin-bottom:7px}
+.pblock:last-child{margin-bottom:0}
+.pblock.shared{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09)}
+.pblock.beginner{background:rgba(58,124,165,.08);border:1px solid rgba(58,124,165,.22)}
+.pblock.elite{background:rgba(199,91,122,.08);border:1px solid rgba(199,91,122,.22)}
+.pblock.lift{background:rgba(45,80,22,.22);border:1px solid rgba(61,107,31,.38)}
+.pblock.warmup{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)}
+.pb-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:500}
+.shared .pb-lbl{color:#F5F0E8}
+.beginner .pb-lbl{color:#5BA3CC}
+.elite .pb-lbl{color:#E87A98}
+.lift .pb-lbl{color:#7DB860}
+.warmup .pb-lbl{color:#F5F0E8}
+.dl{list-style:none;display:flex;flex-direction:column;gap:6px}
+.dl li{font-size:12px;line-height:1.45;color:#F0EBE3;padding-left:14px;position:relative;font-weight:300}
+.dl li::before{content:'→';position:absolute;left:0;top:2px;font-size:10px;color:#F5F0E8}
+.dl li strong{font-weight:600;color:#F5F0E8}
+.dl li em{font-style:normal;font-size:11px;color:#F5F0E8;display:block;margin-top:1px}
+.dl li.dim{color:rgba(245,240,232,.3)}
+.dl li.dim strong{color:rgba(245,240,232,.35)}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+.pill{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:3px;letter-spacing:1px}
+.shared .pill{background:rgba(255,255,255,.07);color:#F5F0E8}
+.beginner .pill{background:rgba(58,124,165,.18);color:#5BA3CC}
+.elite .pill{background:rgba(199,91,122,.18);color:#E87A98}
+.lift .pill{background:rgba(45,80,22,.4);color:#7DB860}
+.wu-text{font-size:12px;color:#D8D0C4;line-height:1.75;font-weight:300}
+.opt-text{color:#E05555;font-style:italic}
+
+/* MODAL */
+
+/* TOAST */
+.empty{color:#F5F0E8;font-size:12px;padding:4px 0}
 </style>
 </head>
 <body>
 
-<!-- HOME SCREEN -->
-<div id="screen-home" class="screen">
+<!-- HOME -->
+<div id="s-home" class="screen">
   <div class="home-header">
-    <div style="display:flex;align-items:center;gap:20px;margin-bottom:14px;">
-      <!-- Jumping athlete SVG logo -->
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-        <!-- Sand pit -->
-        <ellipse cx="44" cy="56" rx="16" ry="5" fill="#C8A96E" opacity="0.35"/>
-        <ellipse cx="44" cy="56" rx="12" ry="3.5" fill="#C8A96E" opacity="0.5"/>
-        <!-- Takeoff board -->
-        <rect x="10" y="48" width="14" height="3" rx="1" fill="#B0B0C4" opacity="0.6"/>
-        <!-- Athlete body — mid-flight hang position -->
-        <!-- Head -->
+    <div class="logo-row">
+      <svg width="54" height="54" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <ellipse cx="44" cy="56" rx="16" ry="5" fill="#C8A96E" opacity=".3"/>
+        <ellipse cx="44" cy="56" rx="12" ry="3.5" fill="#C8A96E" opacity=".45"/>
+        <rect x="10" y="48" width="14" height="3" rx="1" fill="#B0B0C4" opacity=".6"/>
         <circle cx="26" cy="14" r="4" fill="#B0B0C4"/>
-        <!-- Torso -->
         <line x1="26" y1="18" x2="26" y2="30" stroke="#B0B0C4" stroke-width="2.5" stroke-linecap="round"/>
-        <!-- Arms — both raised (hang style) -->
         <line x1="26" y1="21" x2="16" y2="17" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
         <line x1="26" y1="21" x2="36" y2="17" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
-        <!-- Left leg — kicked forward -->
         <line x1="26" y1="30" x2="18" y2="38" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
         <line x1="18" y1="38" x2="12" y2="34" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
-        <!-- Right leg — trailing back -->
         <line x1="26" y1="30" x2="34" y2="40" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
         <line x1="34" y1="40" x2="40" y2="38" stroke="#B0B0C4" stroke-width="2" stroke-linecap="round"/>
-        <!-- Motion arc -->
-        <path d="M 14 50 Q 28 32 42 52" stroke="#B0B0C4" stroke-width="1" stroke-dasharray="3 3" opacity="0.3" fill="none"/>
+        <path d="M14 50 Q28 32 42 52" stroke="#B0B0C4" stroke-width="1" stroke-dasharray="3 3" opacity=".3" fill="none"/>
       </svg>
       <div>
-        <div class="home-label">2026 Season</div>
+        <div class="home-ey">2026 Season</div>
         <div class="home-title">A Jaguar's<span>Horizontal Jumps Plan</span></div>
+      </div>
     </div>
-    <div class="home-sub"><span id="app-version-label" style="font-family:'DM Mono',monospace;font-size:10px;opacity:0.6;"></span></div>
+    <div class="home-ver" id="home-ver"></div>
   </div>
-  <div class="weeks-grid">
-    <div class="weeks-section-label">Practice Weeks</div>
-    <div id="week-tiles"></div>
+  <div class="weeks-list">
+    <div class="weeks-ey">Practice Weeks</div>
+    <div id="week-list"></div>
   </div>
-  <button class="add-week-btn" onclick="openAddWeekModal()">＋ Add New Week</button>
 </div>
 
-<!-- WEEK SCREEN -->
-<div id="screen-week" class="screen hidden">
-  <div class="nav-bar">
-    <div class="nav-back" onclick="goHome()">←</div>
-    <div class="nav-title" id="week-nav-title">Week</div>
-    <div class="nav-action" onclick="openEditWeekModal()">Edit Week</div>
+<!-- WEEK -->
+<div id="s-week" class="screen off">
+  <div class="nav">
+    <div class="nav-back" onclick="go('s-home')">&#8592;</div>
+    <div class="nav-title" id="w-title"></div>
   </div>
   <div class="week-hero">
-    <div class="week-hero-label" id="week-hero-label">Practice Week</div>
-    <div class="week-hero-title" id="week-hero-title">Week Name</div>
-    <div class="week-hero-date" id="week-hero-date"></div>
+    <div class="wh-ey" id="w-ey"></div>
+    <div class="wh-name" id="w-name"></div>
+    <div class="wh-date" id="w-date"></div>
   </div>
-  <div class="week-content">
-
-    <!-- Intensity Overview — collapsed by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Intensity Overview</div>
-        <div class="card-chevron">›</div>
+  <div class="week-body">
+    <div class="ccard">
+      <div class="ccard-head" onclick="toggleC('cb-meets','cc-meets')">
+        <div class="ccard-lbl">Upcoming Meets</div>
+        <div class="ccard-chev open" id="cc-meets">&#8250;</div>
       </div>
-      <div class="card-body">
-        <div class="intensity-grid" id="week-intensity-grid"></div>
-      </div>
+      <div class="ccard-body open" id="cb-meets"><div class="ccard-inner" id="w-meets"></div></div>
     </div>
-
-    <!-- Schedule Notes — collapsed by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Schedule Notes</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditScheduleNotesModal()">Edit</div>
-          <div class="card-chevron">›</div>
-        </div>
+    <div class="sec-ey">Practice Days</div>
+    <div class="day-grid" id="w-days"></div>
+    <div class="ccard">
+      <div class="ccard-head" onclick="toggleC('cb-sn','cc-sn')">
+        <div class="ccard-lbl">Schedule Notes</div>
+        <div class="ccard-chev" id="cc-sn">&#8250;</div>
       </div>
-      <div class="card-body" id="week-schedule-notes"></div>
+      <div class="ccard-body" id="cb-sn"><div class="ccard-inner" id="w-sn"></div></div>
     </div>
-
-    <!-- Coaching Notes — collapsed by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Coaching Notes</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditNotesModal()">Edit</div>
-          <div class="card-chevron">›</div>
-        </div>
+    <div class="ccard">
+      <div class="ccard-head" onclick="toggleC('cb-cn','cc-cn')">
+        <div class="ccard-lbl">Coaching Notes</div>
+        <div class="ccard-chev" id="cc-cn">&#8250;</div>
       </div>
-      <div class="card-body">
-        <div class="notes-text" id="week-coaching-notes"></div>
-      </div>
+      <div class="ccard-body" id="cb-cn"><div class="ccard-inner" id="w-cn"></div></div>
     </div>
-
-    <!-- Upcoming Meets — OPEN by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Upcoming Meets</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditMeetsModal()">Edit</div>
-          <div class="card-chevron open">›</div>
-        </div>
+    <div class="ccard">
+      <div class="ccard-head" onclick="toggleC('cb-roster','cc-roster')">
+        <div class="ccard-lbl">Athlete Roster</div>
+        <div class="ccard-chev" id="cc-roster">&#8250;</div>
       </div>
-      <div class="card-body open" id="week-meets"></div>
+      <div class="ccard-body" id="cb-roster"><div class="ccard-inner" id="w-roster"></div></div>
     </div>
-
-    <!-- Athlete Roster — collapsed by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Athlete Roster</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditAthleteModal(null)">+ Add</div>
-          <div class="card-chevron">›</div>
-        </div>
+    <div class="ccard">
+      <div class="ccard-head" onclick="toggleC('cb-goals','cc-goals')">
+        <div class="ccard-lbl">Meet Goals</div>
+        <div class="ccard-chev" id="cc-goals">&#8250;</div>
       </div>
-      <div class="card-body" id="week-roster"></div>
+      <div class="ccard-body" id="cb-goals"><div class="ccard-inner" id="w-goals"></div></div>
     </div>
-
-    <!-- Meet Goals — collapsed by default -->
-    <div class="card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Meet Goals</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditGoalModal(null)">+ Add</div>
-          <div class="card-chevron">›</div>
-        </div>
+    <div class="ccard" style="margin-bottom:8px">
+      <div class="ccard-head" onclick="toggleC('cb-rec','cc-rec')">
+        <div class="ccard-lbl">Recovery Guidance</div>
+        <div class="ccard-chev" id="cc-rec">&#8250;</div>
       </div>
-      <div class="card-body" id="week-goals"></div>
+      <div class="ccard-body" id="cb-rec"><div class="ccard-inner" id="w-rec"></div></div>
     </div>
-
-    <!-- Day Tiles — always visible, not a collapsible card -->
-    <div class="weeks-section-label" style="margin-top:4px;">Practice Days</div>
-    <div class="days-grid" id="week-day-tiles"></div>
-    <button class="add-week-btn" onclick="openAddDayModal()" style="margin:0;">＋ Add Day</button>
-
-    <!-- Recovery Guidance — collapsed by default -->
-    <div class="card" style="margin-top:14px;">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-label">Recovery Guidance</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="card-edit" onclick="event.stopPropagation();openEditRecoveryModal()">Edit</div>
-          <div class="card-chevron">›</div>
-        </div>
-      </div>
-      <div class="card-body" id="week-recovery"></div>
-    </div>
-
   </div>
 </div>
 
-<!-- DAY SCREEN -->
-<div id="screen-day" class="screen hidden">
-  <div class="nav-bar">
-    <div class="nav-back" onclick="goWeek()">←</div>
-    <div class="nav-title" id="day-nav-title">Day</div>
-    <div class="nav-action" onclick="openEditDayModal()">Edit Day</div>
+<!-- DAY -->
+<div id="s-day" class="screen off">
+  <div class="nav">
+    <div class="nav-back" onclick="go('s-week')">&#8592;</div>
+    <div class="nav-title" id="d-nav"></div>
   </div>
   <div class="day-hero">
-    <div class="day-hero-label" id="day-hero-label">Practice Day</div>
-    <div class="day-hero-title" id="day-hero-title">Monday</div>
-    <div class="day-hero-focus" id="day-hero-focus"></div>
-    <div class="day-int-bar">
-      <div class="day-int-label">Intensity</div>
-      <div class="day-int-track"><div class="day-int-fill" id="day-int-fill"></div></div>
-      <div class="day-int-pct" id="day-int-pct"></div>
+    <div class="dh-ey" id="d-ey"></div>
+    <div class="dh-name" id="d-name"></div>
+    <div class="dh-focus" id="d-focus"></div>
+    <div class="dh-int">
+      <div class="dh-int-lbl">Intensity</div>
+      <div class="dh-int-track"><div class="dh-int-fill" id="d-int-fill"></div></div>
+      <div class="dh-int-pct" id="d-int-pct"></div>
     </div>
   </div>
-  <div class="day-sections" id="day-sections"></div>
+  <div class="day-body" id="d-body"></div>
 </div>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal" id="modal-content"></div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// VERSION
-// ══════════════════════════════════════════════
-const APP_VERSION = 'v2.0';
+'use strict';
+const VER='v3.0';
+const PASS='5522';
+let APP=null,CW=null,CD=null,UNLOCKED=false;
 
-// ══════════════════════════════════════════════
-// DATA SEED
-// ══════════════════════════════════════════════
+const SEED={weeks:[
+{id:'spring-break',name:'Spring Break',label:'Drilling Week',dates:'Tue Mar 25 – Fri Mar 28',color:'#B0B0C4',coachingNotes:'<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',scheduleNotes:[],recovery:[],goals:[],meets:[{date:'4/4',type:'Invitational',name:'Raincross Riverside City Championships'},{date:'4/9',type:'Dual Meet',name:'Ramona (Away)'}],athletes:[{id:'ab',name:'AB Hernandez',group:'elite',events:'LJ · TJ · HJ',marks:"LJ 19'3\" · TJ 41'3\" · HJ 5'8\""},{id:'juan',name:'Juan Ledesma',group:'elite',events:'LJ · TJ',marks:"LJ 18'0\" · TJ 32'8\""},{id:'daniela',name:'Daniela Gamboa',group:'beginner',events:'LJ · TJ',marks:"LJ 12'6\" · TJ 23'10\""},{id:'levi',name:'Levi Gutierrez',group:'beginner',events:'LJ · TJ',marks:"LJ 14'3.5\" · TJ 26'3\""},{id:'pablo',name:'Pablo Jara',group:'beginner',events:'LJ',marks:"LJ 16'2.5\""},{id:'joel',name:'Joel Oros',group:'beginner',events:'LJ',marks:"LJ 12'11\""},{id:'eddie',name:'Eddie Soriano',group:'beginner',events:'LJ',marks:"LJ 12'4.5\""}],days:[
+{id:'tue',name:'Tuesday',focus:'Technique & Drilling',tag:'Drill Day',color:'#7BC8F5',intensity:40,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Technical Drills - Beginner',blocks:[{type:'beginner',label:'Beginner Athletes',drills:[{name:'Phase Intro Walk-Through',note:'Walk hop-step-jump slowly, count rhythm aloud'},{name:'Hop Drills — single-leg hops, 3x15m',note:'Flat foot landing, not rolling to toes'},{name:'Bound Sequence — alternating bounds 3x20m',note:'Forward lean, driving knee up aggressively'},{name:'Step-Phase Isolation — hop + hold step 3x6 reps',note:'Penultimate step must be long and flat; avoid pawing'},{name:'Full Rhythm Drill (no pit) — 3x full TJ approach',note:'Count hop-step-jump at conversational speed'},{name:'Arm Action Drill — stationary double-arm swing',note:'Arms drive up simultaneously at each takeoff'}],pills:['No full speed','Movement quality only']}]},{title:'Technical Drills - Elite',blocks:[{type:'elite',label:'AB · Juan',drills:[{name:'Phase-Specific Speed Drills',note:'Hop-dominant sequence, 4x20m at 80%'},{name:'Bounding Combos — 3x30m alternating bounds',note:'Maximize horizontal distance per contact'},{name:'Step-Phase Emphasis — short approach hop to step only, 4x',note:'Step should equal or exceed hop distance'},{name:'Approach Run Calibration — checkmark work, 3 runs',note:'Verify consistent takeoff board contact'},{name:'Jump Phase Entry Drill — step to pit (no hop), 3x',note:'Feel proper jump-phase body position at pit entry'}],pills:['80% effort','Checkmark work']}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'wed',name:'Wednesday',focus:'Power + Weightroom',tag:'Lift Day',color:'#F0A830',intensity:75,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Track Work (All)',blocks:[{type:'shared',label:'Both Groups',drills:[{name:'Short Approach Jumps — 4-step approach, 5 jumps',note:"Reinforce Tuesday's rhythm"},{name:'Standing Triple Jump — 4 reps',note:'Build explosive power from standstill'},{name:'Standing Broad Jump to Pit — 4 reps',note:'Simulate jump-phase landing'}],pills:['5 full jumps max']}]},{title:'Weightroom (All)',blocks:[{type:'lift',label:'1a / 1b. Mass Specific Force',drills:[{name:'1a. T-Bar Deadlift — 3x6 @ Moderate'},{name:'1b. Box Jumps — 3x6 (moderate height)',note:'Full hip extension at top'}]},{type:'lift',label:'3a / 3b. Posterior Chain',drills:[{name:'3a. RDL — 3x6 @ Moderate'},{name:'3b. Kettlebell Swings — 3x6'}]},{type:'lift',label:'4a / 4b. Unilateral Leg',drills:[{name:'4a. Single-Leg Press — 2x8 each leg'},{name:'4b. Calf Raises — 2x12 (hold final rep)'}]},{type:'lift',label:'5a / 5b. Stability',drills:[{name:'5a. Hands Overhead Lunge — 3x5 each leg'},{name:'5b. Bulgarian Split Squat — 3x5 each leg'}]},{type:'lift',label:'Core Circuit',center:true,drills:[{name:'Dead Bugs — 3x8'},{name:'Pallof Press — 3x8 each side'},{name:'Hanging Step Phase Holds — 3x8'}]}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'fri',name:'Friday',focus:'Competition Simulation',tag:'Hard Day',color:'#E87A5A',intensity:95,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x50m · Nathaniel Stretches'}]},{title:'Competition Simulation — Beginner',blocks:[{type:'beginner',label:'Beginner Athletes',drills:[{name:'Full Approach Jumps — 6 attempts',note:'Simulate meet conditions with rest between'},{name:'Goal: Consistency',note:'Focus on hop-step-jump rhythm — distance is secondary'},{name:'Approach Run — 2 runs post-jumps',note:'Verify consistent board contact'}],pills:['6 full jumps','100% run-up']}]},{title:'Competition Simulation — Elite',blocks:[{type:'elite',label:'AB · Juan',drills:[{name:'Full Competition Block — 8 full attempts',note:'3 attempts, rest, 3 more, rest, 2 bonus'},{name:'Max Effort — at least 3 at 100%',note:'Attack the board'},{name:'Phase Distance Tracking',note:'Measure hop, step, jump separately'},{name:'Approach Precision — zero foul target',note:'Board accuracy is critical'}],pills:['8 full jumps','100% effort']}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch\nNo practice until following Monday — full 3-day recovery window',optional:'400m jog/walk · Ice Bath'}]}]}
+]},
+{id:'raincross',name:'Raincross Week',label:'Meet Prep',dates:'Mon 3/30 – Fri 4/3 · Raincross Riverside City Championships',color:'#E87A5A',coachingNotes:'<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',
+scheduleNotes:[{badge:'MON',type:'warn',text:'Lift first this week, then bounds'},{badge:'6-STEP',type:'info',text:'New 6-step approaches Wed, locked Thu — every athlete leaves with a written mark card'},{badge:'LJ ONLY',type:'info',text:'Pablo, Joel, Eddie, Eduardo Avina, Sofia, Sabrina skip all TJ sections'},{badge:'FRI',type:'warn',text:'2 LJ max effort jumps · 1 TJ max effort jump — hard cap for everyone'}],
+recovery:[{badge:'SLEEP',type:'info',text:'8+ hours Thu and Fri night'},{badge:'HYDRATION',type:'info',text:"Consistent water all week — don't play catch-up Saturday morning"},{badge:'NUTRITION',type:'info',text:'Carb-rich meals Thu and Fri; light but fueled Saturday morning'},{badge:'NO EXTRAS',type:'warn',text:'No added training Thu-Sat outside this plan'}],
+goals:[{id:'g-ab',athleteName:'AB Hernandez',group:'elite',events:'LJ · TJ · HJ',targets:["LJ 20'0+ PR","TJ 42'0+ PR"],cue:"Attack the board with speed, trust the step phase — don't rush the jump."},{id:'g-juan',athleteName:'Juan Ledesma',group:'elite',events:'LJ · TJ',targets:["LJ 18'6+","TJ 33'0+ PR"],cue:'Crack 33 feet in TJ — your step phase is the key. Hold it longer than feels comfortable.'},{id:'g-levi',athleteName:'Levi Gutierrez',group:'beginner',events:'LJ · TJ',targets:["LJ 15'0+","TJ 27'0+ PR"],cue:'Stay tall off the board in LJ. In TJ count the three contacts out loud. Rhythm wins.'},{id:'g-daniela',athleteName:'Daniela Gamboa',group:'beginner',events:'LJ · TJ',targets:["LJ 13'0+","Clean rhythm TJ"],cue:"Hit the board, feel all three contacts, land on two feet. That's a win."},{id:'g-pablo',athleteName:'Pablo Jara',group:'beginner',events:'LJ',targets:["LJ 17'0+ PR"],cue:"You have the speed for 17 feet. Commit to the board."},{id:'g-camyla',athleteName:'Camyla Ramirez-Tapia',group:'beginner',events:'LJ · TJ',targets:["LJ 10'6+ PR","First clean TJ"],cue:'First clean TJ competition. Slow it down if needed — rhythm beats distance.'},{id:'g-joel',athleteName:'Joel Oros',group:'beginner',events:'LJ',targets:["LJ 13'6+ PR"],cue:'Arms up at takeoff — both of them, hard. Trust the drill work.'},{id:'g-eddie',athleteName:'Eddie Soriano',group:'beginner',events:'LJ',targets:["LJ 13'0+ PR"],cue:"Hit the board confidently — speed through the board, not into it."},{id:'g-nayeli',athleteName:'Nayeli',group:'beginner',events:'LJ · TJ',targets:['First meet mark'],cue:'Get a legal mark in both events. Run hard, jump, land.'},{id:'g-kate',athleteName:'Kate Gamboa',group:'beginner',events:'LJ · TJ',targets:['First meet mark'],cue:"Approach, attack, land. You've done this all week."},{id:'g-edu',athleteName:'Eduardo Avina',group:'beginner',events:'LJ',targets:['First meet mark'],cue:"Get on the board and get a legal jump."},{id:'g-sofia',athleteName:'Sofia Gutierrez',group:'beginner',events:'LJ',targets:["LJ 9'6+ PR"],cue:"Swing both arms up hard at takeoff. That's the one cue."},{id:'g-sabrina',athleteName:'Sabrina',group:'beginner',events:'LJ',targets:['First meet mark'],cue:"Compete with confidence. You've put in the work."}],
+meets:[{date:'4/4',type:'Invitational',name:'Raincross Riverside City Championships'},{date:'4/9',type:'Dual Meet',name:'Ramona (Away)'}],
+athletes:[{id:'ab',name:'AB Hernandez',group:'elite',events:'LJ · TJ · HJ',marks:"LJ 19'3 · TJ 41'3 · HJ 5'8"},{id:'juan',name:'Juan Ledesma',group:'elite',events:'LJ · TJ',marks:"LJ 18'0 · TJ 32'8"},{id:'daniela',name:'Daniela Gamboa',group:'beginner',events:'LJ · TJ',marks:"LJ 12'6 · TJ 23'10"},{id:'levi',name:'Levi Gutierrez',group:'beginner',events:'LJ · TJ',marks:"LJ 14'3.5 · TJ 26'3"},{id:'camyla',name:'Camyla Ramirez-Tapia',group:'beginner',events:'LJ · TJ',marks:"LJ 9'10"},{id:'nayeli',name:'Nayeli',group:'beginner',events:'LJ · TJ',marks:'No marks yet'},{id:'kate',name:'Kate Gamboa',group:'beginner',events:'LJ · TJ',marks:'No marks yet'},{id:'pablo',name:'Pablo Jara',group:'beginner',events:'LJ',marks:"LJ 16'2.5"},{id:'joel',name:'Joel Oros',group:'beginner',events:'LJ',marks:"LJ 12'11"},{id:'eddie',name:'Eddie Soriano',group:'beginner',events:'LJ',marks:"LJ 12'4.5"},{id:'eduardo',name:'Eduardo Avina',group:'beginner',events:'LJ',marks:'No marks yet'},{id:'sofia',name:'Sofia Gutierrez',group:'beginner',events:'LJ',marks:"LJ 8'9"},{id:'sabrina',name:'Sabrina',group:'beginner',events:'LJ',marks:'No marks yet'}],
+days:[
+{id:'mon',name:'Monday',focus:'Activation Lift & Bounds',tag:'Hard Day',color:'#E87A5A',intensity:85,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Weightroom — Pre-Meet Activation',blocks:[{type:'lift',label:'Lift Before Bounds This Week',drills:[{name:'CNS-fresh legs produce better bounding output',note:'Lift first, then bounds'}]},{type:'lift',label:'1a / 1b. Mass Specific Force',drills:[{name:'1a. T-Bar Deadlift — 3x6 @ Moderate'},{name:'1b. Box Jumps — 3x6',note:'Full hip extension at top'}]},{type:'lift',label:'3a / 3b. Posterior Chain — Reduced',drills:[{name:'3a. RDL — 2x5 @ Moderate',note:'Activation only, not accumulation'},{name:'3b. Kettlebell Swings — 2x6'}]},{type:'lift',label:'4a / 4b. Unilateral Leg',drills:[{name:'4a. Single-Leg Press — 2x8 each leg'},{name:'4b. Calf Raises — 2x12 (hold final rep)'}]},{type:'lift',label:'5a. Stability — Single Movement Only',drills:[{name:'5a. Hands Overhead Lunge — 3x5 each leg'},{name:'Bulgarian Split Squat — REMOVED this week',note:'Highest soreness risk — legs need to be fresh Saturday',dim:true}]},{type:'lift',label:'Core Circuit — 2 Sets Only',center:true,drills:[{name:'Dead Bugs — 2x8'},{name:'Pallof Press — 2x8 each side'},{name:'Hanging Step Phase Holds — 2x8'}]}]},{title:'Bounding — All Athletes',blocks:[{type:'shared',label:'Both Groups — Post Lift',drills:[{name:'Alternating Bounds — 4x30m',note:'Maximize horizontal per contact'},{name:'Single-Leg Bounds — 3x20m each leg',note:'Reinforce takeoff leg power'},{name:'Bound into LJ Landing — 3x4 bounds to pit',note:'Feel projection angle into sand'}],pills:['Full rest between sets','Stop before fatigue']}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'tue',name:'Tuesday',focus:'Phase Drills & Speed',tag:'Drill Day',color:'#7BC8F5',intensity:50,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Long Jump Drills — All',blocks:[{type:'shared',label:'All Athletes',drills:[{name:'Penultimate Step Walk-Through — 3x6 reps',note:"Last 2 steps long and flat; lower hips"},{name:'Takeoff Angle Drill — short run, 4x into pit',note:"Feel 45 degree projection"},{name:'Hang Position Drill — 4x short approach',note:'Both arms drive up; hips through at takeoff'},{name:'Standing Broad Jump to Pit — 4 reps',note:'Reinforce landing mechanics; reach and pull'}],pills:['60% effort','Quality only']}]},{title:'Triple Jump Drills — Both-Events Athletes',blocks:[{type:'shared',label:'Daniela · Levi · Camyla · Nayeli · Kate · AB · Juan',drills:[{name:'Phase Walk-Through — 3x full TJ slow rhythm',note:'Count hop-step-jump aloud; no speed'},{name:'Hop Isolation — 3x15m single-leg hops',note:'Flat foot landing; push forward not up'},{name:'Step-Phase Emphasis — hop + hold step 3x6',note:'Step should match or exceed hop distance'},{name:'Bound into TJ Rhythm — 3x4 bounds to full TJ finish',note:'Build from Monday bound energy into 3-contact rhythm'},{name:'Full Rhythm Drill (no pit) — 4x short approach',note:'Smooth tempo; all three contacts land flat'},{name:'Arm Action Drill — stationary double-arm swing 2x10'}],pills:['60% effort','No full speed']}]},{title:'Speed Work — All Athletes',blocks:[{type:'shared',label:'Both Groups · CNS Primer',drills:[{name:'4x30m @ 90%',note:'Short, sharp, done. Full rest between each rep.'}],pills:['4 reps only','90% effort','Full rest between']}]},{title:'Elite Additions',blocks:[{type:'elite',label:'AB · Juan',drills:[{name:'Approach Run Calibration — 3 approach-only runs',note:'Verify checkmark consistency'},{name:'LJ Takeoff Precision — 4x short approach, board only',note:'Zero foul focus; feel consistent foot strike'}]}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'wed',name:'Wednesday',focus:'Free Jumping & Approach Finding',tag:'Jump Day',color:'#A8D878',intensity:70,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Rest Protocol',blocks:[{type:'shared',label:'Applied to every attempt today',drills:[{name:'Minimum 4 minutes between every jump',note:'Walk back slowly, breathe, reset mentally. Freshness on each jump is the entire point of today.'}]}]},{title:'Long Jump — Free Jumping',blocks:[{type:'shared',label:'All Athletes · 5 Jumps Max',drills:[{name:'Board-Off Jumps — 5 attempts',note:'Disregard the board — find your natural speed and rhythm'},{name:'Focus: quality takeoff angle, full arm drive',note:'No stress, no fouls — feel fast and free'},{name:'Coach: observe natural attack point',note:"Where each athlete takes off from — this drives Thursday's mark"},{name:'New 6-Step Approach Development',note:'Measure back 6 steps from average takeoff. Mark it. Run through 3x without jumping.'}],pills:['5 jumps max','Board off','4 min rest between']}]},{title:'Triple Jump — Free Jumping',blocks:[{type:'beginner',label:'Both-Events Athletes · 4 Jumps Max',drills:[{name:'Board-Off TJ Attempts — 4 attempts',note:'Find a speed that allows clean phase rhythm'},{name:'Focus: smooth hop-step-jump; no collapse on step',note:'If step collapses, slow down — rhythm over distance'},{name:'New 6-Step TJ Approach',note:'Mark your natural run-up after jumps'}],pills:['4 jumps max','Board off','4 min rest between']}]},{title:'Elite',blocks:[{type:'elite',label:'AB · Juan · 10 Jumps Hard Cap',drills:[{name:'LJ Free Jumps — 6 attempts, board off',note:"Find the speed that produces best projection"},{name:'TJ Free Jumps — 4 attempts, board off',note:'Identify the approach velocity where all three phases stay controlled'},{name:'6-Step Mark Setting',note:'Lock in preliminary marks for both events — refine Thursday'}],pills:['10 jumps hard cap','75-80% effort','No extras']}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'thu',name:'Thursday',focus:'Approach Lock-In & Meet Prep',tag:'Approach Day',color:'#B0B0C4',intensity:60,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m · Nathaniel Stretches'}]},{title:'Runway Walk — All Athletes',blocks:[{type:'shared',label:'Every Athlete · Every Event',drills:[{name:'Walk the approach — count steps out loud',note:'Physical walk from starting mark to board. Hear the count. Own it.'},{name:'Jog the approach — count steps out loud again',note:'Feel the rhythm change at the checkmark.'},{name:"Run at 85% — count steps, don't jump",note:'Confirm the count stays consistent.'}],pills:['3 passes per event','No jumping','Mental rehearsal']}]},{title:'6-Step Approach Refinement',blocks:[{type:'shared',label:'All Athletes',drills:[{name:'Approach-Only Runs — 5x per event',note:"Take Wednesday's mark and run through it."},{name:'First-Step Landmark',note:"Identify where your first step lands — this is what you hit at the meet"},{name:'Checkpoint Mark',note:"Set a mid-run checkpoint (step 3 or 4) — if you hit it, you'll hit the board"},{name:'Approach + Pop-Up — 3x per event',note:'Full approach, barely jump — feel the board at the right speed'},{name:'Mark Card — leave with this today',note:'Write: starting mark · first-step landmark · checkpoint · board distance. This goes to the meet.'}],pills:['Approach only','4 jumps max','Mark card required']}]},{title:'Light Jumping — Beginner',blocks:[{type:'beginner',label:'Beginner Group · 4 Jumps Max',drills:[{name:'LJ Short Approach Jumps — 3 reps @ 70%',note:'Use new 6-step mark; land cleanly'},{name:'TJ Short Approach — 1 rep (both-events athletes)',note:'Comfortable tempo; feel 3-contact rhythm into pit'}],pills:['4 jumps max','70% effort','Legs fresh for Saturday']}]},{title:'Elite',blocks:[{type:'elite',label:'AB · Juan · 4 Jumps Max',drills:[{name:'LJ with Board — 2 attempts @ 80%',note:'Hit the board from the new mark; refine if drifting'},{name:'TJ with Board — 2 attempts @ 75%',note:'Confirm mark gives clean board contact'},{name:'Finalize Mark Card',note:'Starting mark · checkpoint · board distance — carry this to the meet'}],pills:['4 jumps max','Marks locked']}]},{title:'Team Talk — 5 Minutes',blocks:[{type:'shared',label:'End of Practice · All Athletes',drills:[{name:'Each athlete states: their starting mark, their one technical cue, their intention for their first jump',note:'Say it out loud. Own it.'}]}]},{title:'Meet Logistics',blocks:[{type:'shared',label:'Communicate before leaving today',drills:[{name:'Arrival time · warm-up order · flight assignments',note:'What to eat Saturday morning · spikes check · no surprises on meet day.'}]}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk'}]}]},
+{id:'fri',name:'Friday',focus:'Meet Prep & Activation',tag:'Prep Day',color:'#E87A98',intensity:40,sections:[{title:'Warm-Up (All)',blocks:[{type:'warmup',label:'~15 min',content:'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',optional:'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x50m · Nathaniel Stretches'}]},{title:'First-Step Landmark Hits',blocks:[{type:'shared',label:'All Athletes',drills:[{name:'Approach-Only Runs — 3x per event',note:'Hit your first-step landmark every time'},{name:'Checkpoint Confirmation',note:'Verify mid-run checkpoint is consistent with Thursday'}],pills:['Approach only','Low intensity']}]},{title:'Long Jump — All Athletes',blocks:[{type:'beginner',label:'All Athletes · LJ · 2 Jumps Hard Cap',drills:[{name:'2 max effort LJ attempts',note:'Hit the board, attack, land clean. Full effort.'}],pills:['2 jumps — no more','Max effort']}]},{title:'Triple Jump — Both-Events Athletes',blocks:[{type:'beginner',label:'Both-Events Athletes · TJ · 1 Jump Hard Cap',drills:[{name:'1 max effort TJ attempt',note:'One clean run-through of all three phases. Walk away confident.'},{name:'No additional TJ jumps — hard cap',note:'Protect legs for Saturday',dim:true}],pills:['1 jump — hard cap','Max effort']}]},{title:'Elite',blocks:[{type:'elite',label:'AB · Juan · 3 Jumps Total',drills:[{name:'LJ — 2 max effort board jumps',note:'Feel fast, hit the mark, project forward'},{name:'TJ — 1 max effort board jump',note:'Clean rhythm, clean contacts, walk away locked in'},{name:'One final approach-only run',note:'Leave the track with that feeling'}],pills:['3 jumps total','Max effort']}]},{title:'Meet-Day Mindset',blocks:[{type:'shared',label:'Saturday is execution, not discovery',drills:[{name:"Every athlete goes to the meet knowing their mark, their rhythm, and trusting what they've built this week.",note:"Compete what you've already practiced."}]}]},{title:'Cool-Down (All)',blocks:[{type:'warmup',label:'~10 min',content:'Static Stretch',optional:'400m jog/walk · Ice Bath'}]}]}
+]}
+]};
 
-const SEED_DATA = {
-  weeks: [
-    {
-      id: 'spring-break',
-      name: 'Spring Break',
-      label: 'Drilling Week',
-      dates: 'Tue Mar 25 – Fri Mar 28',
-      color: '#B0B0C4',
-      meet: null,
-      coachingNotes: '<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',
-      scheduleNotes: [],
-      recovery: [],
-      goals: [],
-      meets: [
-        { date: '4/4', type: 'Invitational', name: 'Raincross Riverside City Championships' },
-        { date: '4/9', type: 'Dual Meet', name: 'Ramona (Away)' }
-      ],
-      athletes: [
-        { id: 'ab', name: 'AB Hernandez', group: 'elite', events: 'LJ · TJ · HJ', marks: "LJ 19'3\" · TJ 41'3\" · HJ 5'8\"" },
-        { id: 'juan', name: 'Juan Ledesma', group: 'elite', events: 'LJ · TJ', marks: "LJ 18'0\" · TJ 32'8\"" },
-        { id: 'daniela', name: 'Daniela Gamboa', group: 'beginner', events: 'LJ · TJ', marks: "LJ 12'6\" · TJ 23'10\"" },
-        { id: 'levi', name: 'Levi Gutierrez', group: 'beginner', events: 'LJ · TJ', marks: "LJ 14'3.5\" · TJ 26'3\"" },
-        { id: 'pablo', name: 'Pablo Jara', group: 'beginner', events: 'LJ', marks: "LJ 16'2.5\"" },
-        { id: 'joel', name: 'Joel Oros', group: 'beginner', events: 'LJ', marks: "LJ 12'11\"" },
-        { id: 'eddie', name: 'Eddie Soriano', group: 'beginner', events: 'LJ', marks: "LJ 12'4.5\"" }
-      ],
-      days: [
-        {
-          id: 'tue',
-          name: 'Tuesday',
-          focus: 'Technique & Drilling',
-          tag: 'Drill Day',
-          color: '#7BC8F5',
-          intensity: 40,
-          sections: [
-            {
-              title: 'Warm-Up (All)',
-              blocks: [
-                { type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }
-              ]
-            },
-            {
-              title: 'Technical Drills — Beginner',
-              blocks: [
-                { type: 'beginner', label: 'Beginner · Both Athletes', drills: [
-                  { name: 'Phase Intro Walk-Through', note: 'Walk hop–step–jump slowly, count rhythm aloud (1-2-3)' },
-                  { name: 'Hop Drills — single-leg hops, 3×15m', note: 'Emphasize flat foot landing, not rolling to toes' },
-                  { name: 'Bound Sequence — alternating bounds 3×20m', note: 'Focus on forward lean, driving knee up aggressively' },
-                  { name: 'Step-Phase Isolation — hop + hold step 3×6 reps', note: 'Penultimate step must be long and flat; avoid pawing' },
-                  { name: 'Full Rhythm Drill (no pit) — 3×full TJ approach', note: 'Count out "hop-step-jump" at conversational speed' },
-                  { name: 'Arm Action Drill — stationary double-arm swing', note: 'Arms drive up simultaneously at each takeoff' }
-                ], pills: ['~45 min', 'No full speed', 'Movement quality only'] }
-              ]
-            },
-            {
-              title: 'Technical Drills — Elite',
-              blocks: [
-                { type: 'elite', label: 'Elite · AB · Juan', drills: [
-                  { name: 'Phase-Specific Speed Drills', note: 'Hop-dominant sequence, 4×20m at 80% — attack the board' },
-                  { name: 'Bounding Combos — 3×30m alternating bounds', note: 'Maximize horizontal distance per contact; quick ground contact' },
-                  { name: 'Step-Phase Emphasis — short approach hop→step only, 4×', note: 'Step should equal or exceed hop distance — common weakness' },
-                  { name: 'Approach Run Calibration — checkmark work, 3 runs', note: 'Verify consistent takeoff board contact; no chopping steps' },
-                  { name: 'Jump Phase Entry Drill — step → pit (no hop), 3×', note: 'Feel proper jump-phase body position at pit entry' }
-                ], pills: ['~50 min', '≤80% effort', 'Checkmark work'] }
-              ]
-            },
-            {
-              title: 'Cool-Down (All)',
-              blocks: [
-                { type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'wed',
-          name: 'Wednesday',
-          focus: 'Power + Weightroom',
-          tag: 'Lift Day',
-          color: '#F0A830',
-          intensity: 75,
-          sections: [
-            {
-              title: 'Warm-Up (All)',
-              blocks: [
-                { type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }
-              ]
-            },
-            {
-              title: 'Track Work (All)',
-              blocks: [
-                { type: 'shared', label: 'Both Groups', drills: [
-                  { name: 'Short Approach Jumps — 4-step approach, 5 jumps', note: "Reinforce Tuesday's rhythm; stay relaxed, no sprinting" },
-                  { name: 'Standing Triple Jump — 4 reps', note: 'Build explosive power from a standstill; count contacts' },
-                  { name: 'Standing Broad Jump → Pit — 4 reps', note: 'Simulate jump-phase landing; absorb with soft knees in pit' }
-                ], pills: ['~20 min track', '5 full jumps max'] }
-              ]
-            },
-            {
-              title: 'Weightroom (All)',
-              blocks: [
-                { type: 'lift', label: '1a / 1b. Mass Specific Force', drills: [
-                  { name: '1a. T-Bar Deadlift — 3×6 @ Moderate' },
-                  { name: '1b. Box Jumps — 3×6 (moderate height)', note: 'Two-foot takeoff; full hip extension at top' }
-                ]},
-                { type: 'lift', label: '3a / 3b. Posterior Chain Superset', drills: [
-                  { name: '3a. Romanian Deadlift (RDL) — 3×6 @ Moderate' },
-                  { name: '3b. Kettlebell Swings — 3×6', note: 'Explosive hip hinge — mirrors triple jump ground contact' }
-                ]},
-                { type: 'lift', label: '4a / 4b. Unilateral Leg Superset', drills: [
-                  { name: '4a. Single-Leg Press — 2×8 each leg' },
-                  { name: '4b. Calf Raises — 2×12 (hold final rep of each set)', note: 'Ankle stiffness is critical for every ground contact in TJ' }
-                ]},
-                { type: 'lift', label: '5a / 5b. Stability Superset', drills: [
-                  { name: '5a. Hands Overhead Lunge — 3×5 each leg', note: 'Arms overhead increases core demand and mimics flight posture' },
-                  { name: '5b. Bulgarian Split Squat — 3×5 each leg', note: 'Unilateral hip & quad strength; critical for hop-leg loading' }
-                ]},
-                { type: 'lift', label: 'Core Circuit', centerLabel: true, drills: [
-                  { name: 'Dead Bugs — 3×8' },
-                  { name: 'Pallof Press — 3×8 each side', note: 'Anti-rotation stability for flight phases' },
-                  { name: 'Hanging Step Phase Holds — 3×8', note: 'Drive knee to step-phase position and hold' }
-                ]}
-              ]
-            },
-            {
-              title: 'Cool-Down (All)',
-              blocks: [
-                { type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'fri',
-          name: 'Friday',
-          focus: 'High-Intensity Competition Sim',
-          tag: 'Hard Day',
-          color: '#E87A5A',
-          intensity: 95,
-          sections: [
-            {
-              title: 'Warm-Up (All)',
-              blocks: [
-                { type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×50m · Nathaniel Stretches' }
-              ]
-            },
-            {
-              title: 'Competition Simulation — Beginner',
-              blocks: [
-                { type: 'beginner', label: 'Beginner · Both Athletes', drills: [
-                  { name: 'Full Approach Jumps — 6 competition-style attempts', note: 'Use full run-up; simulate meet conditions with rest between' },
-                  { name: 'Goal: Consistency', note: 'Focus on executing the hop-step-jump rhythm learned Tuesday — distance is secondary to technique' },
-                  { name: 'Video Each Jump if possible', note: 'Review phase ratios: hop ~33.33%, step ~33.33%, jump ~33.33%' },
-                  { name: 'Approach Run — 2 approach-only runs post-jumps', note: 'Verify consistent board contact' }
-                ], pills: ['6 full jumps', '100% run-up', '3–4 min rest between'] }
-              ]
-            },
-            {
-              title: 'Competition Simulation — Elite',
-              blocks: [
-                { type: 'elite', label: 'Elite · AB · Juan', drills: [
-                  { name: 'Full Competition Block — 8 full attempts', note: 'Simulate a full meet: 3 attempts, rest, 3 more, rest, 2 bonus' },
-                  { name: 'Max Effort Attempts — at least 3 at 100% effort', note: 'Attack the board; use competition mindset' },
-                  { name: 'PR Pursuit', note: 'Ideal session to chase a season-best; all systems fresh by Monday' },
-                  { name: 'Phase Distance Tracking', note: 'Measure hop, step, jump distances separately. Target step phase ≥ 28%' },
-                  { name: 'Approach Precision — zero foul target', note: 'Board accuracy is critical; note any pattern in approach drift' }
-                ], pills: ['8 full jumps', '100% effort', 'Full rest', '3 days recovery'] }
-              ]
-            },
-            {
-              title: 'Post-Jumping Sprint Work',
-              blocks: [
-                { type: 'shared', label: 'Both Groups', drills: [
-                  { name: 'Beginner: 4×30m at 85%', note: 'Short recoveries; running speed feeds jumping distance' },
-                  { name: 'Elite: 4×60m at 90–95%', note: 'Builds approach velocity capacity for late-season PRs' }
-                ]}
-              ]
-            },
-            {
-              title: 'Cool-Down (All)',
-              blocks: [
-                { type: 'warmup', label: '~10 min', content: 'Static Stretch\nNo practice until following Monday — full 3-day recovery window', optional: '400m jog/walk · Ice Bath' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'pre-meet',
-      name: 'Raincross Week',
-      label: 'Meet Prep',
-      dates: 'Mon 3/30 – Fri 4/3 · Raincross Riverside City Championships',
-      color: '#E87A5A',
-      meet: 'SAT 4/4 — Raincross Riverside City Championships',
-      coachingNotes: '<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact<br><strong>Beginner:</strong> Rhythm and safety before speed<br><strong>Elite:</strong> Step phase distance — most HS athletes leave feet on the table',
-      scheduleNotes: [
-        { badge: 'MON', type: 'warn', text: 'Lift first this week, then bounds — CNS-fresh legs for better bounding output' },
-        { badge: '6-STEP', type: 'info', text: 'New 6-step approaches developed Wed, locked in Thu — every athlete leaves Thursday with a written mark card' },
-        { badge: 'LJ ONLY', type: 'info', text: 'Pablo, Joel, Eddie, Eduardo Avina, Sofia, Sabrina skip all TJ sections' },
-        { badge: 'FRI', type: 'warn', text: '2 LJ max effort jumps · 1 TJ max effort jump — hard cap for everyone' }
-      ],
-      recovery: [
-        { badge: 'SLEEP', type: 'info', text: '8+ hours Thu and Fri night — this is where readiness happens' },
-        { badge: 'HYDRATION', type: 'info', text: 'Consistent water all week — don\'t play catch-up Saturday morning' },
-        { badge: 'NUTRITION', type: 'info', text: 'Carb-rich meals Thu and Fri; light but fueled Saturday morning' },
-        { badge: 'NO EXTRAS', type: 'warn', text: 'No added training Thu–Sat outside this plan — trust the week' }
-      ],
-      goals: [
-        { id: 'g-ab',      athleteName: 'AB Hernandez',         group: 'elite',    events: 'LJ · TJ · HJ', targets: ["LJ 20'0\"+ PR", "TJ 42'0\"+ PR"],  cue: "Attack the board with speed, trust the step phase — don't rush the jump. Let it happen." },
-        { id: 'g-juan',    athleteName: 'Juan Ledesma',          group: 'elite',    events: 'LJ · TJ',       targets: ["LJ 18'6\"+", "TJ 33'0\"+ PR"],     cue: 'Crack 33 feet in TJ — your step phase is the key. Hold it longer than feels comfortable.' },
-        { id: 'g-levi',    athleteName: 'Levi Gutierrez',        group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 15'0\"+", "TJ 27'0\"+ PR"],     cue: 'Stay tall off the board in LJ. In TJ — count the three contacts out loud in your head. Rhythm wins.' },
-        { id: 'g-daniela', athleteName: 'Daniela Gamboa',        group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 13'0\"+", 'Clean rhythm TJ'],   cue: 'Distance will come. Today: hit the board, feel all three contacts, land on two feet. That\'s a win.' },
-        { id: 'g-pablo',   athleteName: 'Pablo Jara',            group: 'beginner', events: 'LJ',            targets: ["LJ 17'0\"+ PR"],                   cue: "You have the speed for 17 feet. Commit to the board — don't hesitate on the last two steps." },
-        { id: 'g-camyla',  athleteName: 'Camyla Ramirez-Tapia',  group: 'beginner', events: 'LJ · TJ',       targets: ["LJ 10'6\"+ PR", 'First clean TJ'], cue: 'First clean TJ competition. Slow it down if needed — rhythm beats distance every time at this stage.' },
-        { id: 'g-joel',    athleteName: 'Joel Oros',             group: 'beginner', events: 'LJ',            targets: ["LJ 13'6\"+ PR"],                   cue: 'Arms up at takeoff — both of them, hard. That alone is worth 6–8 inches. Trust the drill work.' },
-        { id: 'g-eddie',   athleteName: 'Eddie Soriano',         group: 'beginner', events: 'LJ',            targets: ["LJ 13'0\"+ PR"],                   cue: "Hit the board confidently — don't slow down approaching it. Speed through the board, not into it." },
-        { id: 'g-nayeli',  athleteName: 'Nayeli',                group: 'beginner', events: 'LJ · TJ',       targets: ['First meet mark'],                  cue: 'Get a legal mark in both events. Everything else is bonus. Run hard, jump, land — done.' },
-        { id: 'g-kate',    athleteName: 'Kate Gamboa',           group: 'beginner', events: 'LJ · TJ',       targets: ['First meet mark'],                  cue: 'Same as practice — approach, attack, land. You\'ve done this all week. Saturday is just another rep.' },
-        { id: 'g-edu',     athleteName: 'Eduardo Avina',         group: 'beginner', events: 'LJ',            targets: ['First meet mark'],                  cue: "Get on the board and get a legal jump. Run through it — don't slow down at the end of the runway." },
-        { id: 'g-sofia',   athleteName: 'Sofia Gutierrez',       group: 'beginner', events: 'LJ',            targets: ["LJ 9'6\"+ PR"],                    cue: 'Swing both arms up hard at takeoff. That\'s the one cue. Everything else follows if you do that.' },
-        { id: 'g-sabrina', athleteName: 'Sabrina',               group: 'beginner', events: 'LJ',            targets: ['First meet mark'],                  cue: "Compete with confidence. You've put in the work this week — show up Saturday and trust it." }
-      ],
-      meets: [
-        { date: '4/4', type: 'Invitational', name: 'Raincross Riverside City Championships' },
-        { date: '4/9', type: 'Dual Meet', name: 'Ramona (Away)' }
-      ],
-      athletes: [
-        { id: 'ab', name: 'AB Hernandez', group: 'elite', events: 'LJ · TJ · HJ', marks: "LJ 19'3\" · TJ 41'3\" · HJ 5'8\"" },
-        { id: 'juan', name: 'Juan Ledesma', group: 'elite', events: 'LJ · TJ', marks: "LJ 18'0\" · TJ 32'8\"" },
-        { id: 'daniela', name: 'Daniela Gamboa', group: 'beginner', events: 'LJ · TJ', marks: "LJ 12'6\" · TJ 23'10\"" },
-        { id: 'levi', name: 'Levi Gutierrez', group: 'beginner', events: 'LJ · TJ', marks: "LJ 14'3.5\" · TJ 26'3\"" },
-        { id: 'camyla', name: 'Camyla Ramirez-Tapia', group: 'beginner', events: 'LJ · TJ', marks: "LJ 9'10\"" },
-        { id: 'nayeli', name: 'Nayeli', group: 'beginner', events: 'LJ · TJ', marks: 'No marks yet' },
-        { id: 'kata', name: 'Kate Gamboa', group: 'beginner', events: 'LJ · TJ', marks: 'No marks yet' },
-        { id: 'pablo', name: 'Pablo Jara', group: 'beginner', events: 'LJ', marks: "LJ 16'2.5\"" },
-        { id: 'joel', name: 'Joel Oros', group: 'beginner', events: 'LJ', marks: "LJ 12'11\"" },
-        { id: 'eddie', name: 'Eddie Soriano', group: 'beginner', events: 'LJ', marks: "LJ 12'4.5\"" },
-        { id: 'eduardo', name: 'Eduardo Avina', group: 'beginner', events: 'LJ', marks: 'No marks yet' },
-        { id: 'sofia', name: 'Sofia Gutierrez', group: 'beginner', events: 'LJ', marks: "LJ 8'9\"" },
-        { id: 'sabrina', name: 'Sabrina', group: 'beginner', events: 'LJ', marks: 'No marks yet' }
-      ],
-      days: [
-        {
-          id: 'mon', name: 'Monday', focus: 'Activation Lift & Bounds', tag: 'Hard Day', color: '#E87A5A', intensity: 85,
-          sections: [
-            { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
-            { title: 'Weightroom First — Pre-Meet Activation', blocks: [
-              { type: 'lift', label: 'Lift Before Bounds This Week', drills: [{ name: 'CNS-fresh legs produce better bounding output', note: 'Lift first, then bounds — save explosive capacity for after the lift' }] },
-              { type: 'lift', label: '1a / 1b. Mass Specific Force', drills: [{ name: '1a. T-Bar Deadlift — 3×6 @ Moderate' }, { name: '1b. Box Jumps — 3×6 (moderate height)', note: 'Full hip extension at top — CNS activation' }] },
-              { type: 'lift', label: '3a / 3b. Posterior Chain — Reduced', drills: [{ name: '3a. RDL — 2×5 @ Moderate', note: 'Cut from 3×6 — activation only, not accumulation' }, { name: '3b. Kettlebell Swings — 2×6' }] },
-              { type: 'lift', label: '4a / 4b. Unilateral Leg', drills: [{ name: '4a. Single-Leg Press — 2×8 each leg' }, { name: '4b. Calf Raises — 2×12 (hold final rep)', note: 'Ankle stiffness matters meet week — keep this in' }] },
-              { type: 'lift', label: '5a. Stability — Single Movement Only', drills: [{ name: '5a. Hands Overhead Lunge — 3×5 each leg' }, { name: 'Bulgarian Split Squat — REMOVED this week', note: 'Highest soreness risk in the program — legs need to be fresh Saturday' }] },
-              { type: 'lift', label: 'Core Circuit — 2 Sets Only', centerLabel: true, drills: [{ name: 'Dead Bugs — 2×8' }, { name: 'Pallof Press — 2×8 each side' }, { name: 'Hanging Step Phase Holds — 2×8' }] }
-            ]},
-            { title: 'Bounding — All Athletes', blocks: [
-              { type: 'shared', label: 'Both Groups — Post Lift', drills: [
-                { name: 'Alternating Bounds — 4×30m', note: 'Maximize horizontal per contact; aggressive knee drive' },
-                { name: 'Single-Leg Bounds — 3×20m each leg', note: 'Reinforce takeoff leg power; stay tall' },
-                { name: 'Bound into LJ Landing — 3×4 bounds → pit', note: 'Feel projection angle into sand; two-foot landing' }
-              ], pills: ['~25 min', 'Full rest between sets', 'Stop before fatigue'] }
-            ]},
-            { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
-          ]
-        },
-        {
-          id: 'tue', name: 'Tuesday', focus: 'Phase Drills & Speed', tag: 'Drill Day', color: '#7BC8F5', intensity: 50,
-          sections: [
-            { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
-            { title: 'Long Jump Drills — All', blocks: [
-              { type: 'shared', label: 'All Athletes', drills: [
-                { name: 'Penultimate Step Walk-Through — 3×6 reps', note: "Last 2 steps long and flat; lower hips, don't pop upright" },
-                { name: 'Takeoff Angle Drill — short run, 4× into pit', note: "Feel 45° projection; don't stand up at board" },
-                { name: 'Hang Position Drill — 4× short approach', note: 'Both arms drive up; hips through at takeoff, hold hang in air' },
-                { name: 'Standing Broad Jump → Pit — 4 reps', note: 'Reinforce landing mechanics; reach and pull' }
-              ], pills: ['≤60% effort', 'Quality only'] }
-            ]},
-            { title: 'Triple Jump Drills — Both-Events Athletes', blocks: [
-              { type: 'shared', label: 'Daniela · Levi · Camyla · Nayeli · Kate · AB · Juan', drills: [
-                { name: 'Phase Walk-Through — 3× full TJ slow rhythm', note: 'Count hop-step-jump aloud; no speed' },
-                { name: 'Hop Isolation — 3×15m single-leg hops', note: 'Flat foot landing; push forward not up' },
-                { name: 'Step-Phase Emphasis — hop + hold step 3×6', note: 'Step should match or exceed hop distance' },
-                { name: 'Bound into TJ Rhythm — 3×4 bounds → full TJ finish', note: 'Build from Monday bound energy into 3-contact rhythm; stay relaxed through all phases' },
-                { name: 'Full Rhythm Drill (no pit) — 4× short approach', note: 'Smooth tempo; all three contacts land flat' },
-                { name: 'Arm Action Drill — stationary double-arm swing 2×10', note: 'Arms drive up simultaneously at each takeoff' }
-              ], pills: ['≤60% effort', 'No full speed'] }
-            ]},
-            { title: 'Speed Work — All Athletes', blocks: [
-              { type: 'shared', label: 'Both Groups · CNS Primer', drills: [
-                { name: '4×30m @ 90%', note: 'Short, sharp, done — keeps the nervous system primed without taxing recovery. Full rest between each rep.' }
-              ], pills: ['4 reps only', '90% effort', 'Full rest between'] }
-            ]},
-            { title: 'Elite Additions', blocks: [
-              { type: 'elite', label: 'AB · Juan', drills: [
-                { name: 'Approach Run Calibration — 3 approach-only runs', note: 'Verify checkmark consistency; no chopping steps' },
-                { name: 'LJ Takeoff Precision — 4× short approach, board only', note: 'Zero foul focus; feel consistent foot strike' }
-              ]}
-            ]},
-            { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
-          ]
-        },
-        {
-          id: 'wed', name: 'Wednesday', focus: 'Free Jumping & Approach Finding', tag: 'Jump Day', color: '#A8D878', intensity: 70,
-          sections: [
-            { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
-            { title: 'Rest Protocol — All Groups', blocks: [
-              { type: 'shared', label: 'Applied to every attempt today', drills: [
-                { name: 'Minimum 4 minutes between every jump', note: 'Walk back slowly, breathe, reset mentally. No rushed attempts — freshness on each jump is the entire point of today.' }
-              ]}
-            ]},
-            { title: 'Long Jump — Free Jumping', blocks: [
-              { type: 'shared', label: 'All Athletes · 5 Jumps Max', drills: [
-                { name: 'Board-Off Jumps — 5 attempts', note: 'Disregard the board entirely — find your natural speed and rhythm' },
-                { name: 'Focus: quality takeoff angle, full arm drive, hang or kick', note: 'No stress, no fouls — feel fast and free' },
-                { name: 'Coach: observe natural attack point', note: 'Where each athlete consistently takes off from — this drives Thursday\'s mark' },
-                { name: 'New 6-Step Approach Development', note: 'After jumps, measure back 6 steps from average takeoff spot. Mark it. Run through 3× without jumping.' }
-              ], pills: ['5 jumps max', 'Board off', '4 min rest between'] }
-            ]},
-            { title: 'Triple Jump — Free Jumping', blocks: [
-              { type: 'beginner', label: 'Both-Events Athletes · 4 Jumps Max', drills: [
-                { name: 'Board-Off TJ Attempts — 4 attempts', note: 'Find a speed that allows clean phase rhythm all the way through' },
-                { name: 'Focus: smooth hop→step→jump; no collapse on step', note: 'If step collapses, slow down — rhythm over distance' },
-                { name: 'New 6-Step TJ Approach', note: 'Mark your natural run-up after jumps' }
-              ], pills: ['4 jumps max', 'Board off', '4 min rest between', 'Rhythm priority'] }
-            ]},
-            { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan · 10 Jumps Hard Cap', drills: [
-                { name: 'LJ Free Jumps — 6 attempts, board off', note: 'Find the speed that produces best projection — that\'s your meet speed' },
-                { name: 'TJ Free Jumps — 4 attempts, board off', note: 'Identify the approach velocity where all three phases stay controlled' },
-                { name: '6-Step Mark Setting', note: 'Lock in preliminary marks for both events — refine Thursday' }
-              ], pills: ['10 jumps hard cap', '75–80% effort', '4 min rest between', 'No extras'] }
-            ]},
-            { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
-          ]
-        },
-        {
-          id: 'thu', name: 'Thursday', focus: 'Approach Lock-In & Meet Prep', tag: 'Approach Day', color: '#B0B0C4', intensity: 60,
-          sections: [
-            { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
-            { title: 'Runway Walk — All Athletes', blocks: [
-              { type: 'shared', label: 'Every Athlete · Every Event', drills: [
-                { name: 'Walk the approach — count steps out loud', note: 'Physical walk from starting mark to board. Hear the count. Own it.' },
-                { name: 'Jog the approach — count steps out loud again', note: 'Same count, slightly faster. Feel the rhythm change at the checkmark.' },
-                { name: 'Run at 85% — count steps, don\'t jump', note: 'Now it feels like a meet. Confirm the count stays consistent.' }
-              ], pills: ['3 passes per event', 'No jumping', 'Mental rehearsal'] }
-            ]},
-            { title: '6-Step Approach Refinement — All', blocks: [
-              { type: 'shared', label: 'All Athletes', drills: [
-                { name: 'Approach-Only Runs — 5× per event', note: 'Take Wednesday\'s mark and run through it. Count steps, feel the rhythm, don\'t jump.' },
-                { name: 'First-Step Landmark', note: 'Identify where your first step lands — this is what you hit at the meet' },
-                { name: 'Checkpoint Mark', note: 'Set a mid-run checkpoint (step 3 or 4) — if you hit it, you\'ll hit the board' },
-                { name: 'Approach + Pop-Up — 3× per event', note: 'Full approach, barely jump — feel the board underfoot at the right speed' },
-                { name: 'Mark Card — leave with this today', note: 'Write down: starting mark · first-step landmark · checkpoint step · board distance. This goes to the meet.' }
-              ], pills: ['Approach only', '4 jumps max', 'Mark card required'] }
-            ]},
-            { title: 'Light Jumping — Beginner', blocks: [
-              { type: 'beginner', label: 'Beginner Group · 4 Jumps Max Total', drills: [
-                { name: 'LJ Short Approach Jumps — 3 reps @ 70%', note: 'Use new 6-step mark; land cleanly, note any adjustments' },
-                { name: 'TJ Short Approach — 1 rep (both-events athletes)', note: 'Comfortable tempo; feel the 3-contact rhythm into pit' }
-              ], pills: ['4 jumps max', '≤70% effort', 'Legs fresh for Saturday'] }
-            ]},
-            { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan · 4 Jumps Max Total', drills: [
-                { name: 'LJ with Board — 2 attempts @ 80%', note: 'Hit the board from the new mark; refine if drifting' },
-                { name: 'TJ with Board — 2 attempts @ 75%', note: 'Controlled speed; confirm mark gives clean board contact' },
-                { name: 'Finalize Mark Card', note: 'Starting mark · checkpoint · board distance for both events — carry this to the meet' }
-              ], pills: ['4 jumps max', '≤80%', 'Marks locked'] }
-            ]},
-            { title: 'Team Talk — 5 Minutes', blocks: [
-              { type: 'shared', label: 'End of Practice · All Athletes', drills: [
-                { name: 'Each athlete states: their starting mark, their one technical cue, their intention for their first jump', note: 'Say it out loud. Own it. Hear yourself say it before you compete it.' }
-              ]}
-            ]},
-            { title: 'Meet Logistics', blocks: [
-              { type: 'shared', label: 'Communicate before leaving today', drills: [
-                { name: 'Arrival time · warm-up order · flight assignments', note: 'What to eat Saturday morning · spikes check · no surprises on meet day — handle it all Thursday.' }
-              ]}
-            ]},
-            { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
-          ]
-        },
-        {
-          id: 'fri', name: 'Friday', focus: 'Meet Prep & Activation', tag: 'Prep Day', color: '#E87A98', intensity: 40,
-          sections: [
-            { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×50m · Nathaniel Stretches' }] },
-            { title: 'First-Step Landmark Hits', blocks: [
-              { type: 'shared', label: 'All Athletes', drills: [
-                { name: 'Approach-Only Runs — 3× per event', note: 'Hit your first-step landmark every time — this is the only job today' },
-                { name: 'Checkpoint Confirmation', note: 'Verify mid-run checkpoint is consistent with Thursday' }
-              ], pills: ['Approach only', 'Low intensity'] }
-            ]},
-            { title: 'Long Jump — All Athletes', blocks: [
-              { type: 'beginner', label: 'All Athletes · LJ · 2 Jumps Hard Cap', drills: [
-                { name: '2 max effort LJ attempts', note: 'Hit the board, attack, land clean. Full effort. This is it for LJ today.' }
-              ], pills: ['2 jumps — no more', 'Max effort'] }
-            ]},
-            { title: 'Triple Jump — Both-Events Athletes', blocks: [
-              { type: 'beginner', label: 'Both-Events Athletes · TJ · 1 Jump Hard Cap', drills: [
-                { name: '1 max effort TJ attempt', note: 'One clean run-through of all three phases. Walk away confident.' },
-                { name: 'No additional TJ jumps — hard cap', note: 'Highest mechanical load of any jump event — protect legs for Saturday' }
-              ], pills: ['1 jump — hard cap', 'Max effort'] }
-            ]},
-            { title: 'Elite', blocks: [
-              { type: 'elite', label: 'AB · Juan · 3 Jumps Total', drills: [
-                { name: 'LJ — 2 max effort board jumps', note: 'Feel fast, hit the mark, project forward — preview of Saturday' },
-                { name: 'TJ — 1 max effort board jump', note: 'Clean rhythm, clean contacts, walk away locked in' },
-                { name: 'One final approach-only run', note: 'Last thing you do is nail the approach — leave the track with that feeling' }
-              ], pills: ['3 jumps total', 'Max effort', 'Leave something for Saturday'] }
-            ]},
-            { title: 'Meet-Day Mindset', blocks: [
-              { type: 'shared', label: 'Saturday is execution, not discovery', drills: [
-                { name: 'Every athlete goes to the meet knowing their mark, their rhythm, and trusting what they\'ve built this week.', note: 'The goal is to compete what you\'ve already practiced — not learn anything new on the runway.' }
-              ]}
-            ]},
-            { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk · Ice Bath' }] }
-          ]
-        }
-      ]
-    }
-  ]
-};
+function loadData(){try{const v=localStorage.getItem('jp-ver');if(v!==VER){localStorage.removeItem('jp-data');localStorage.setItem('jp-ver',VER);return null;}const d=localStorage.getItem('jp-data');return d?JSON.parse(d):null;}catch(e){return null;}}
+function saveData(){try{localStorage.setItem('jp-data',JSON.stringify(APP));}catch(e){}}
 
-// ══════════════════════════════════════════════
-// STORAGE
-// ══════════════════════════════════════════════
 
-async function loadData() {
-  try {
-    const result = localStorage.getItem('jump-planner-data');
-    return result ? JSON.parse(result) : null;
-  } catch {
-    return null;
-  }
-}
 
-async function saveData(data) {
-  try {
-    localStorage.setItem('jump-planner-data', JSON.stringify(data));
-  } catch(e) {
-    console.error('Save failed', e);
-  }
-}
-
-let APP = null;
-let currentWeekId = null;
-let currentDayId = null;
-
-async function initApp() {
-  // Force clear any stale data — fresh seed on every version bump
-  const storedVersion = localStorage.getItem('jump-planner-version');
-  if (storedVersion !== APP_VERSION) {
-    localStorage.removeItem('jump-planner-data');
-    localStorage.setItem('jump-planner-version', APP_VERSION);
-  }
-  const saved = await loadData();
-  if (saved) {
-    // Patch any missing fields on existing weeks
-    saved.weeks = saved.weeks.map(w => ({
-      scheduleNotes: [],
-      recovery: [],
-      goals: [],
-      ...w
-    }));
-    APP = saved;
-  } else {
-    APP = JSON.parse(JSON.stringify(SEED_DATA));
-    await saveData(APP);
-  }
-  const vEl = document.getElementById('app-version-label');
-  if (vEl) vEl.textContent = APP_VERSION;
+function init(){
+  APP=loadData()||JSON.parse(JSON.stringify(SEED));
+  document.getElementById('home-ver').textContent=VER;
   renderHome();
 }
 
-// ══════════════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════════════
 
-function showScreen(id, direction = 'forward') {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('slide-left');
-    if (s.id !== id) {
-      if (direction === 'forward') s.classList.add('hidden');
-      else s.classList.add('hidden');
-    }
-  });
-  const target = document.getElementById(id);
-  target.classList.remove('hidden', 'slide-left');
-  target.scrollTop = 0;
+function go(sid){document.querySelectorAll('.screen').forEach(s=>{if(s.id===sid){s.classList.remove('off');s.scrollTop=0;}else s.classList.add('off');});}
+
+function toggleC(bodyId,chevId){
+  const body=document.getElementById(bodyId);
+  const chev=document.getElementById(chevId);
+  if(!body)return;
+  const open=body.classList.toggle('open');
+  if(chev)chev.classList.toggle('open',open);
 }
 
-function goHome() {
-  showScreen('screen-home', 'back');
-  currentWeekId = null;
-  currentDayId = null;
-}
-
-function goWeek() {
-  showScreen('screen-week', 'back');
-  currentDayId = null;
-}
-
-function toggleCard(header) {
-  const body = header.nextElementSibling;
-  const chevron = header.querySelector('.card-chevron');
-  const isOpen = body.classList.toggle('open');
-  if (chevron) chevron.classList.toggle('open', isOpen);
-}
-
-// ══════════════════════════════════════════════
-// RENDER: HOME
-// ══════════════════════════════════════════════
-
-function renderHome() {
-  const container = document.getElementById('week-tiles');
-  container.innerHTML = '';
-
-  // Most recent week at top
-  const sorted = [...APP.weeks].reverse();
-
-  sorted.forEach(week => {
-    const tile = document.createElement('div');
-    tile.className = 'week-tile';
-    tile.onclick = () => openWeek(week.id);
-
-    const dayDots = week.days.map(d =>
-      `<div class="day-dot" style="background:${d.color}88"></div>`
-    ).join('');
-
-    tile.innerHTML = `
-      <div class="week-tile-accent" style="background:${week.color}"></div>
-      <div class="week-tile-top">
-        <div>
-          <div class="week-tile-name" style="color:${week.color}">${week.name}</div>
-          <div class="week-tile-date">${week.dates}</div>
-        </div>
-      </div>
-      <div class="week-tile-days">${dayDots}</div>
-      <div class="week-tile-chevron">›</div>
-    `;
-    container.appendChild(tile);
+function renderHome(){
+  const list=document.getElementById('week-list');
+  list.innerHTML='';
+  [...APP.weeks].reverse().forEach(w=>{
+    const dots=(w.days||[]).map(d=>`<div class="w-dot" style="background:${d.color}88"></div>`).join('');
+    const el=document.createElement('div');
+    el.className='week-tile';
+    el.innerHTML=`<div class="w-bar" style="background:${w.color}"></div><div class="w-name" style="color:${w.color}">${w.name}</div><div class="w-date">${w.dates}</div><div class="w-dots">${dots}</div><div class="w-chev">&#8250;</div>`;
+    el.addEventListener('click',()=>openWeek(w.id));
+    list.appendChild(el);
   });
 }
 
-// ══════════════════════════════════════════════
-// RENDER: WEEK
-// ══════════════════════════════════════════════
+function openWeek(id){CW=APP.weeks.find(w=>w.id===id);if(!CW)return;renderWeek();go('s-week');}
 
-function openWeek(weekId) {
-  try {
-    currentWeekId = weekId;
-    const week = APP.weeks.find(w => w.id === weekId);
-    if (!week) { showToast('Week not found'); return; }
-    week.scheduleNotes = week.scheduleNotes || [];
-    week.recovery = week.recovery || [];
-    week.goals = week.goals || [];
-    week.athletes = week.athletes || [];
-    week.meets = week.meets || [];
-    week.days = week.days || [];
-    renderWeek(week);
-    showScreen('screen-week');
-  } catch(e) {
-    showToast('Error: ' + e.message);
-    console.error('openWeek error:', e);
-  }
-}
-
-function renderWeek(week) {
-  try {
-  document.getElementById('week-nav-title').textContent = week.name.toUpperCase();
-  document.getElementById('week-hero-label').textContent = week.label || 'Practice Week';
-  document.getElementById('week-hero-title').textContent = week.name;
-  document.getElementById('week-hero-date').textContent = week.dates;
-
-  // Intensity grid
-  const grid = document.getElementById('week-intensity-grid');
-  grid.innerHTML = '';
-  week.days.forEach(day => {
-    const col = document.createElement('div');
-    col.className = 'int-day';
-    col.innerHTML = `
-      <div class="int-day-name">${day.name.substring(0,3)}</div>
-      <div class="int-day-bar-track">
-        <div class="int-day-bar-fill" style="height:${day.intensity}%;background:${day.color}"></div>
-      </div>
-      <div class="int-day-pct">${day.intensity}%</div>
-    `;
-    grid.appendChild(col);
+function renderWeek(){
+  const w=CW;
+  document.getElementById('w-title').textContent=w.name.toUpperCase();
+  document.getElementById('w-ey').textContent=w.label||'Practice Week';
+  document.getElementById('w-name').textContent=w.name;
+  document.getElementById('w-date').textContent=w.dates;
+  const meets=w.meets||[];
+  document.getElementById('w-meets').innerHTML=meets.length?meets.map(m=>`<div class="meet-row"><span class="meet-badge">${m.date}</span><span class="meet-txt"><strong>${m.type}:</strong> ${m.name}</span></div>`).join(''):'<div class="empty">No meets scheduled.</div>';
+  const daysEl=document.getElementById('w-days');
+  daysEl.innerHTML='';
+  (w.days||[]).forEach(d=>{
+    const el=document.createElement('div');el.className='day-tile';
+    el.innerHTML=`<div class="dt-bar" style="background:${d.color}"></div><div class="dt-tag" style="background:${d.color}22;color:${d.color};border:1px solid ${d.color}55">${d.tag}</div><div class="dt-name" style="color:${d.color}">${d.name}</div><div class="dt-focus">${d.focus}</div><div class="dt-int"><div class="dt-int-fill" style="width:${d.intensity}%;background:${d.color}"></div></div><div class="dt-pct">${d.intensity}%</div>`;
+    el.addEventListener('click',()=>openDay(d.id));
+    daysEl.appendChild(el);
   });
-
-  // Coaching notes
-  document.getElementById('week-coaching-notes').innerHTML = week.coachingNotes || 'No coaching notes yet.';
-
-  // Schedule Notes
-  const schedNotesEl = document.getElementById('week-schedule-notes');
-  const notes = week.scheduleNotes || [];
-  if (notes.length) {
-    schedNotesEl.innerHTML = notes.map(n => `
-      <div class="recovery-row">
-        <span class="recovery-badge ${n.type === 'warn' ? 'warn' : 'info'}">${n.badge}</span>
-        <span class="recovery-text">${n.text}</span>
-      </div>
-    `).join('');
-  } else {
-    schedNotesEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No schedule notes yet.</div>';
-  }
-
-  // Meets
-  const meetsEl = document.getElementById('week-meets');
-  if (week.meets && week.meets.length) {
-    meetsEl.innerHTML = week.meets.map(m => `
-      <div class="meet-row">
-        <span class="meet-badge" style="background:rgba(176,176,196,0.1);color:var(--silver-light);border:1px solid rgba(176,176,196,0.25);">${m.date}</span>
-        <span class="meet-text"><strong>${m.type}:</strong> ${m.name}</span>
-      </div>
-    `).join('');
-  } else {
-    meetsEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No meets scheduled.</div>';
-  }
-
-  // Roster
-  const rosterEl = document.getElementById('week-roster');
-  const eliteAthletes = week.athletes.filter(a => a.group === 'elite');
-  const beginnerBoth = week.athletes.filter(a => a.group === 'beginner' && a.events.includes('TJ'));
-  const beginnerLJ = week.athletes.filter(a => a.group === 'beginner' && !a.events.includes('TJ'));
-
-  rosterEl.innerHTML = '';
-  [
-    { label: 'Elite', athletes: eliteAthletes, color: 'var(--elite-light)' },
-    { label: 'Beginner — Both Events', athletes: beginnerBoth, color: 'var(--beginner-light)' },
-    { label: 'Beginner — Long Jump Only', athletes: beginnerLJ, color: 'var(--beginner-light)' }
-  ].forEach(group => {
-    if (!group.athletes.length) return;
-    const groupEl = document.createElement('div');
-    groupEl.className = 'roster-group';
-    groupEl.innerHTML = `<div class="roster-group-label">${group.label}</div>` +
-      group.athletes.map(a => `
-        <div class="athlete-row" onclick="openEditAthleteModal('${a.id}')">
-          <div class="athlete-dot" style="background:${group.color}"></div>
-          <div class="athlete-name">${a.name}</div>
-          <div class="athlete-marks">
-            <span style="color:var(--silver-light);font-size:9px;">${a.events}</span>
-            <span>${a.marks}</span>
-          </div>
-        </div>
-      `).join('');
-    rosterEl.appendChild(groupEl);
-  });
-
-  // Goals
-  const goalsEl = document.getElementById('week-goals');
-  const goals = week.goals || [];
-  if (goals.length) {
-    goalsEl.innerHTML = '<div class="goals-grid-app">' + goals.map(g => {
-      const isElite = g.group === 'elite';
-      const pillClass = isElite ? 'elite-pill' : 'begin-pill';
-      const dotColor = isElite ? 'var(--elite-light)' : 'var(--beginner-light)';
-      return `
-        <div class="goal-row" onclick="openEditGoalModal('${g.id}')">
-          <div class="goal-row-dot" style="background:${dotColor}"></div>
-          <div class="goal-row-main">
-            <div class="goal-row-name">${g.athleteName}</div>
-            <div class="goal-row-event">${g.events}</div>
-            <div class="goal-row-targets">
-              ${(g.targets || []).map(t => `<span class="goal-target-pill ${pillClass}">${t}</span>`).join('')}
-            </div>
-            <div class="goal-row-cue">${g.cue}</div>
-          </div>
-        </div>
-      `;
-    }).join('') + '</div>';
-  } else {
-    goalsEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No meet goals yet. Tap + Add to create goals for each athlete.</div>';
-  }
-
-  // Day tiles
-  const tilesEl = document.getElementById('week-day-tiles');
-  tilesEl.innerHTML = '';
-  week.days.forEach(day => {
-    const tile = document.createElement('div');
-    tile.className = 'day-tile';
-    tile.onclick = () => openDay(day.id);
-    tile.innerHTML = `
-      <div class="day-tile-accent" style="background:${day.color}"></div>
-      <div class="day-tile-tag" style="background:${day.color}22;color:${day.color};border:1px solid ${day.color}44;">${day.tag}</div>
-      <div class="day-tile-name" style="color:${day.color}">${day.name}</div>
-      <div class="day-tile-focus">${day.focus}</div>
-      <div class="day-tile-int"><div class="day-tile-int-fill" style="width:${day.intensity}%;background:${day.color}"></div></div>
-      <div class="day-tile-int-pct">${day.intensity}%</div>
-    `;
-    tilesEl.appendChild(tile);
-  });
-
-  // Recovery
-  const recoveryEl = document.getElementById('week-recovery');
-  const rec = week.recovery || [];
-  if (rec.length) {
-    recoveryEl.innerHTML = rec.map(r => `
-      <div class="recovery-row">
-        <span class="recovery-badge ${r.type === 'warn' ? 'warn' : 'info'}">${r.badge}</span>
-        <span class="recovery-text">${r.text}</span>
-      </div>
-    `).join('');
-  } else {
-    recoveryEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">No recovery notes yet.</div>';
-  }
-  } catch(e) {
-    showToast('Render error: ' + e.message);
-    console.error('renderWeek error:', e);
-  }
-}
-
-// ══════════════════════════════════════════════
-// RENDER: DAY
-// ══════════════════════════════════════════════
-
-function openDay(dayId) {
-  currentDayId = dayId;
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const day = week.days.find(d => d.id === dayId);
-  renderDay(week, day);
-  showScreen('screen-day');
-}
-
-function renderDay(week, day) {
-  document.getElementById('day-nav-title').textContent = day.name.toUpperCase();
-  document.getElementById('day-hero-label').textContent = week.name;
-  document.getElementById('day-hero-title').textContent = day.name;
-  document.getElementById('day-hero-title').style.color = day.color;
-  document.getElementById('day-hero-focus').textContent = day.focus;
-  document.getElementById('day-int-fill').style.cssText = `width:${day.intensity}%;background:${day.color}`;
-  document.getElementById('day-int-pct').textContent = `${day.intensity}%`;
-
-  const sectionsEl = document.getElementById('day-sections');
-  sectionsEl.innerHTML = '';
-
-  day.sections.forEach((section, si) => {
-    const card = document.createElement('div');
-    card.className = 'section-card';
-
-    const body = document.createElement('div');
-    body.className = 'section-card-body open';
-    body.innerHTML = renderSectionBlocks(section.blocks);
-
-    const header = document.createElement('div');
-    header.className = 'section-card-header';
-    header.innerHTML = `
-      <div class="section-card-title">${section.title}</div>
-      <div class="section-card-chevron open">›</div>
-    `;
-    header.onclick = () => {
-      const isOpen = body.classList.toggle('open');
-      header.querySelector('.section-card-chevron').classList.toggle('open', isOpen);
-    };
-
-    card.appendChild(header);
-    card.appendChild(body);
-    sectionsEl.appendChild(card);
-  });
-}
-
-function renderSectionBlocks(blocks) {
-  return blocks.map(block => {
-    if (block.type === 'warmup') {
-      return `
-        <div class="practice-block warmup">
-          <div class="block-label">${block.label}</div>
-          <div class="warmup-text">${(block.content || '').replace(/\n/g,'<br>')}
-          ${block.optional ? `<br><span class="opt-text">Optional: ${block.optional}</span>` : ''}</div>
-        </div>
-      `;
-    }
-
-    const drillsHTML = block.drills ? `
-      <ul class="drill-list">
-        ${block.drills.map(d => `
-          <li><strong>${d.name}</strong>${d.note ? `<em>${d.note}</em>` : ''}</li>
-        `).join('')}
-      </ul>
-    ` : '';
-
-    const pillsHTML = block.pills ? `
-      <div class="vol-row">
-        ${block.pills.map(p => `<div class="vol-pill">${p}</div>`).join('')}
-      </div>
-    ` : '';
-
-    const labelStyle = block.centerLabel ? 'text-align:center;' : '';
-
-    return `
-      <div class="practice-block ${block.type}">
-        <div class="block-label" style="${labelStyle}">${block.label}</div>
-        ${drillsHTML}
-        ${pillsHTML}
-      </div>
-    `;
-  }).join('');
-}
-
-// ══════════════════════════════════════════════
-// MODALS
-
-// Schedule Notes Modal
-function openEditScheduleNotesModal() {
-  if (!sessionUnlocked) { requireAuth(openEditScheduleNotesModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const notes = week.scheduleNotes || [];
-  openModal(`
-    <div class="modal-title">Schedule Notes <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Badge</div>
-      <input class="modal-input" id="sn-badge" placeholder="e.g. MON, FRI, LJ ONLY">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Type</div>
-      <select class="modal-select" id="sn-type">
-        <option value="info">Info (silver)</option>
-        <option value="warn">Warning (orange)</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Note</div>
-      <input class="modal-input" id="sn-text" placeholder="Note text">
-    </div>
-    <button class="modal-btn" onclick="addScheduleNote()">Add Note</button>
-    <div style="margin-top:20px;">
-      <div class="modal-label" style="margin-bottom:10px;">Current Notes</div>
-      <div id="sn-list">
-        ${notes.map((n, i) => `
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <div style="flex:1;font-size:12px;"><strong>${n.badge}</strong> — ${n.text}</div>
-            <div style="color:var(--optional);cursor:pointer;" onclick="deleteScheduleNote(${i})">✕</div>
-          </div>
-        `).join('') || '<div style="color:var(--muted);font-size:12px;">No notes yet</div>'}
-      </div>
-    </div>
-  `);
-}
-
-function addScheduleNote() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const badge = document.getElementById('sn-badge').value.trim().toUpperCase();
-  const text = document.getElementById('sn-text').value.trim();
-  if (!badge || !text) { showToast('Enter badge and note'); return; }
-  week.scheduleNotes = week.scheduleNotes || [];
-  week.scheduleNotes.push({ badge, type: document.getElementById('sn-type').value, text });
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Note added');
-}
-
-function deleteScheduleNote(index) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.scheduleNotes.splice(index, 1);
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Note removed');
-}
-
-// Recovery Modal
-function openEditRecoveryModal() {
-  if (!sessionUnlocked) { requireAuth(openEditRecoveryModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const rec = week.recovery || [];
-  openModal(`
-    <div class="modal-title">Recovery Guidance <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Badge</div>
-      <input class="modal-input" id="rec-badge" placeholder="e.g. SLEEP, HYDRATION">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Type</div>
-      <select class="modal-select" id="rec-type">
-        <option value="info">Info (silver)</option>
-        <option value="warn">Warning (orange)</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Guidance</div>
-      <input class="modal-input" id="rec-text" placeholder="Recovery note text">
-    </div>
-    <button class="modal-btn" onclick="addRecoveryNote()">Add Note</button>
-    <div style="margin-top:20px;">
-      <div class="modal-label" style="margin-bottom:10px;">Current Notes</div>
-      <div id="rec-list">
-        ${rec.map((r, i) => `
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <div style="flex:1;font-size:12px;"><strong>${r.badge}</strong> — ${r.text}</div>
-            <div style="color:var(--optional);cursor:pointer;" onclick="deleteRecoveryNote(${i})">✕</div>
-          </div>
-        `).join('') || '<div style="color:var(--muted);font-size:12px;">No notes yet</div>'}
-      </div>
-    </div>
-  `);
-}
-
-function addRecoveryNote() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const badge = document.getElementById('rec-badge').value.trim().toUpperCase();
-  const text = document.getElementById('rec-text').value.trim();
-  if (!badge || !text) { showToast('Enter badge and note'); return; }
-  week.recovery = week.recovery || [];
-  week.recovery.push({ badge, type: document.getElementById('rec-type').value, text });
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Recovery note added');
-}
-
-function deleteRecoveryNote(index) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.recovery.splice(index, 1);
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Note removed');
-}
-
-// Goals Modal
-function openEditGoalModal(goalId) {
-  if (!sessionUnlocked) { requireAuth(() => openEditGoalModal(goalId)); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const goal = goalId ? (week.goals || []).find(g => g.id === goalId) : null;
-  const isNew = !goal;
-  openModal(`
-    <div class="modal-title">${isNew ? 'Add Goal' : 'Edit Goal'} <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Athlete Name</div>
-      <input class="modal-input" id="eg-name" value="${goal?.athleteName || ''}" placeholder="Athlete name">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Group</div>
-      <select class="modal-select" id="eg-group">
-        <option value="elite" ${goal?.group === 'elite' ? 'selected' : ''}>Elite</option>
-        <option value="beginner" ${goal?.group !== 'elite' ? 'selected' : ''}>Beginner</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Events</div>
-      <input class="modal-input" id="eg-events" value="${goal?.events || ''}" placeholder="LJ · TJ">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Targets (comma separated)</div>
-      <input class="modal-input" id="eg-targets" value="${(goal?.targets || []).join(', ')}" placeholder="LJ 18'0\"+ PR, TJ 33'0\"+ PR">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Intent Cue</div>
-      <textarea class="modal-textarea" id="eg-cue" style="min-height:80px;">${goal?.cue || ''}</textarea>
-    </div>
-    <button class="modal-btn" onclick="saveGoal('${goalId || ''}')">Save</button>
-    ${!isNew ? `<button class="modal-btn modal-btn-danger" onclick="deleteGoal('${goalId}')">Remove Goal</button>` : ''}
-  `);
-}
-
-function saveGoal(goalId) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const name = document.getElementById('eg-name').value.trim();
-  if (!name) { showToast('Enter athlete name'); return; }
-  const targets = document.getElementById('eg-targets').value.split(',').map(t => t.trim()).filter(Boolean);
-  week.goals = week.goals || [];
-  if (goalId) {
-    const g = week.goals.find(g => g.id === goalId);
-    g.athleteName = name;
-    g.group = document.getElementById('eg-group').value;
-    g.events = document.getElementById('eg-events').value.trim();
-    g.targets = targets;
-    g.cue = document.getElementById('eg-cue').value.trim();
-  } else {
-    week.goals.push({
-      id: 'g-' + Date.now(),
-      athleteName: name,
-      group: document.getElementById('eg-group').value,
-      events: document.getElementById('eg-events').value.trim(),
-      targets,
-      cue: document.getElementById('eg-cue').value.trim()
+  document.getElementById('w-cn').innerHTML=w.coachingNotes||'<div class="empty">No coaching notes.</div>';
+  const sn=w.scheduleNotes||[];
+  document.getElementById('w-sn').innerHTML=sn.length?sn.map(n=>`<div class="note-row"><span class="note-badge ${n.type||'info'}">${n.badge}</span><span class="note-txt">${n.text}</span></div>`).join(''):'<div class="empty">No schedule notes.</div>';
+  const rEl=document.getElementById('w-roster');rEl.innerHTML='';
+  const ath=w.athletes||[];
+  const elite=ath.filter(a=>a.group==='elite');
+  const bBoth=ath.filter(a=>a.group==='beginner'&&a.events.includes('TJ'));
+  const bLJ=ath.filter(a=>a.group==='beginner'&&!a.events.includes('TJ'));
+  [{label:'Elite',list:elite,color:'#E87A98'},{label:'Beginner — Both Events',list:bBoth,color:'#5BA3CC'},{label:'Beginner — Long Jump Only',list:bLJ,color:'#5BA3CC'}].forEach(g=>{
+    if(!g.list.length)return;
+    const h=document.createElement('div');h.className='rg-lbl';h.textContent=g.label;rEl.appendChild(h);
+    g.list.forEach(a=>{
+      const r=document.createElement('div');r.className='ath-row';
+      r.style.cursor='default';
+      r.innerHTML=`<div class="ath-dot" style="background:${g.color}"></div><div class="ath-name">${a.name}</div><div class="ath-marks"><span class="ath-ev">${a.events}</span><span class="ath-mk">${a.marks}</span></div>`;
+      rEl.appendChild(r);
     });
-  }
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast(goalId ? 'Goal updated' : 'Goal added');
-}
-
-function deleteGoal(goalId) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.goals = week.goals.filter(g => g.id !== goalId);
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Goal removed');
-}
-
-// ══════════════════════════════════════════════
-
-function openModal(html) {
-  document.getElementById('modal-content').innerHTML = html;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-
-function closeModal(e) {
-  if (e && e.target !== document.getElementById('modal-overlay')) return;
-  document.getElementById('modal-overlay').classList.remove('open');
-}
-
-function closeModalDirect() {
-  document.getElementById('modal-overlay').classList.remove('open');
-}
-
-// Add Week
-function openAddWeekModal() {
-  if (!sessionUnlocked) { requireAuth(openAddWeekModal); return; }
-  openModal(`
-    <div class="modal-title">New Week <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Week Name</div>
-      <input class="modal-input" id="nw-name" placeholder="e.g. Championship Week">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Label / Theme</div>
-      <input class="modal-input" id="nw-label" placeholder="e.g. Taper Week">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Dates</div>
-      <input class="modal-input" id="nw-dates" placeholder="e.g. Mon Apr 7 – Fri Apr 11">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Meet This Week?</div>
-      <input class="modal-input" id="nw-meet" placeholder="e.g. SAT 4/12 — League Finals (leave blank if none)">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Accent Color</div>
-      <input class="modal-input" id="nw-color" placeholder="#B0B0C4" value="#B0B0C4">
-    </div>
-    <button class="modal-btn" onclick="saveNewWeek()">Create Week</button>
-  `);
-}
-
-function saveNewWeek() {
-  const name = document.getElementById('nw-name').value.trim();
-  if (!name) { showToast('Enter a week name'); return; }
-  const week = {
-    id: 'week-' + Date.now(),
-    name,
-    label: document.getElementById('nw-label').value.trim() || 'Practice Week',
-    dates: document.getElementById('nw-dates').value.trim() || '',
-    color: document.getElementById('nw-color').value.trim() || '#B0B0C4',
-    meet: document.getElementById('nw-meet').value.trim() || null,
-    coachingNotes: '<strong>Phase Ratios:</strong> Hop ~33.33% / Step ~33.33% / Jump ~33.33%<br><strong>Key Cue:</strong> Active foot — dorsiflexed ankle at every contact',
-    meets: [],
-    athletes: [],
-    days: []
-  };
-  APP.weeks.push(week);
-  saveData(APP);
-  closeModalDirect();
-  renderHome();
-  showToast('Week created');
-}
-
-// Edit Week
-function openEditWeekModal() {
-  if (!sessionUnlocked) { requireAuth(openEditWeekModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  openModal(`
-    <div class="modal-title">Edit Week <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Week Name</div>
-      <input class="modal-input" id="ew-name" value="${week.name}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Label</div>
-      <input class="modal-input" id="ew-label" value="${week.label || ''}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Dates</div>
-      <input class="modal-input" id="ew-dates" value="${week.dates || ''}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Meet This Week?</div>
-      <input class="modal-input" id="ew-meet" value="${week.meet || ''}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Accent Color</div>
-      <input class="modal-input" id="ew-color" value="${week.color}">
-    </div>
-    <button class="modal-btn" onclick="saveEditWeek()">Save</button>
-    <button class="modal-btn modal-btn-danger" onclick="deleteWeek()">Delete Week</button>
-  `);
-}
-
-function saveEditWeek() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.name = document.getElementById('ew-name').value.trim() || week.name;
-  week.label = document.getElementById('ew-label').value.trim();
-  week.dates = document.getElementById('ew-dates').value.trim();
-  week.meet = document.getElementById('ew-meet').value.trim() || null;
-  week.color = document.getElementById('ew-color').value.trim();
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  renderHome();
-  showToast('Week updated');
-}
-
-function deleteWeek() {
-  if (!confirm('Delete this week?')) return;
-  APP.weeks = APP.weeks.filter(w => w.id !== currentWeekId);
-  saveData(APP);
-  closeModalDirect();
-  goHome();
-  showToast('Week deleted');
-}
-
-// Edit Notes
-function openEditNotesModal() {
-  if (!sessionUnlocked) { requireAuth(openEditNotesModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  openModal(`
-    <div class="modal-title">Coaching Notes <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Notes (HTML ok)</div>
-      <textarea class="modal-textarea" id="en-notes" style="min-height:180px">${week.coachingNotes || ''}</textarea>
-    </div>
-    <button class="modal-btn" onclick="saveNotes()">Save</button>
-  `);
-}
-
-function saveNotes() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.coachingNotes = document.getElementById('en-notes').value;
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Notes saved');
-}
-
-// Edit Meets
-function openEditMeetsModal() {
-  if (!sessionUnlocked) { requireAuth(openEditMeetsModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const meetsJSON = JSON.stringify(week.meets || [], null, 2);
-  openModal(`
-    <div class="modal-title">Meets <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Date</div>
-      <input class="modal-input" id="em-date" placeholder="4/12">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Type</div>
-      <input class="modal-input" id="em-type" placeholder="Invitational / Dual Meet">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Name</div>
-      <input class="modal-input" id="em-name" placeholder="Meet Name">
-    </div>
-    <button class="modal-btn" onclick="addMeet()">Add Meet</button>
-    <div style="margin-top:20px;">
-      <div class="modal-label" style="margin-bottom:10px;">Current Meets</div>
-      <div id="em-list">
-        ${(week.meets || []).map((m,i) => `
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <div style="flex:1;font-size:13px;">${m.date} — ${m.type}: ${m.name}</div>
-            <div style="color:var(--optional);cursor:pointer;font-size:13px;" onclick="deleteMeet(${i})">✕</div>
-          </div>
-        `).join('') || '<div style="color:var(--muted);font-size:12px;">No meets yet</div>'}
-      </div>
-    </div>
-  `);
-}
-
-function addMeet() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const date = document.getElementById('em-date').value.trim();
-  const type = document.getElementById('em-type').value.trim();
-  const name = document.getElementById('em-name').value.trim();
-  if (!date || !name) { showToast('Enter date and name'); return; }
-  week.meets = week.meets || [];
-  week.meets.push({ date, type: type || 'Meet', name });
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Meet added');
-}
-
-function deleteMeet(index) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.meets.splice(index, 1);
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Meet removed');
-}
-
-// Athlete Modal
-function openEditAthleteModal(athleteId) {
-  if (!sessionUnlocked) { requireAuth(() => openEditAthleteModal(athleteId)); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const athlete = athleteId ? week.athletes.find(a => a.id === athleteId) : null;
-  const isNew = !athlete;
-
-  openModal(`
-    <div class="modal-title">${isNew ? 'Add Athlete' : 'Edit Athlete'} <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Name</div>
-      <input class="modal-input" id="ea-name" value="${athlete?.name || ''}" placeholder="Full Name">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Group</div>
-      <select class="modal-select" id="ea-group">
-        <option value="elite" ${athlete?.group==='elite'?'selected':''}>Elite</option>
-        <option value="beginner" ${athlete?.group!=='elite'?'selected':''}>Beginner</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Events</div>
-      <input class="modal-input" id="ea-events" value="${athlete?.events || ''}" placeholder="LJ · TJ">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Current Marks</div>
-      <input class="modal-input" id="ea-marks" value="${athlete?.marks || ''}" placeholder="LJ 18'0&quot; · TJ 32'8&quot;">
-    </div>
-    <button class="modal-btn" onclick="saveAthlete('${athleteId || ''}')">Save</button>
-    ${!isNew ? `<button class="modal-btn modal-btn-danger" onclick="deleteAthlete('${athleteId}')">Remove Athlete</button>` : ''}
-  `);
-}
-
-function saveAthlete(athleteId) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const name = document.getElementById('ea-name').value.trim();
-  if (!name) { showToast('Enter athlete name'); return; }
-
-  if (athleteId) {
-    const a = week.athletes.find(a => a.id === athleteId);
-    a.name = name;
-    a.group = document.getElementById('ea-group').value;
-    a.events = document.getElementById('ea-events').value.trim();
-    a.marks = document.getElementById('ea-marks').value.trim();
-  } else {
-    week.athletes.push({
-      id: 'ath-' + Date.now(),
-      name,
-      group: document.getElementById('ea-group').value,
-      events: document.getElementById('ea-events').value.trim(),
-      marks: document.getElementById('ea-marks').value.trim() || 'No marks yet'
-    });
-  }
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast(athleteId ? 'Athlete updated' : 'Athlete added');
-}
-
-function deleteAthlete(athleteId) {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.athletes = week.athletes.filter(a => a.id !== athleteId);
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast('Athlete removed');
-}
-
-// Add Day
-function openAddDayModal() {
-  if (!sessionUnlocked) { requireAuth(openAddDayModal); return; }
-  openModal(`
-    <div class="modal-title">Add Day <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Day Name</div>
-      <select class="modal-select" id="ad-name">
-        <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-        <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Focus / Theme</div>
-      <input class="modal-input" id="ad-focus" placeholder="e.g. Technique & Drilling">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Tag</div>
-      <input class="modal-input" id="ad-tag" placeholder="e.g. Drill Day">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Intensity %</div>
-      <input class="modal-input" id="ad-int" type="number" min="0" max="100" value="60">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Color</div>
-      <input class="modal-input" id="ad-color" value="#7BC8F5">
-    </div>
-    <button class="modal-btn" onclick="saveNewDay()">Add Day</button>
-  `);
-}
-
-function saveNewDay() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const name = document.getElementById('ad-name').value;
-  week.days.push({
-    id: 'day-' + Date.now(),
-    name,
-    focus: document.getElementById('ad-focus').value.trim() || 'Practice',
-    tag: document.getElementById('ad-tag').value.trim() || 'Practice Day',
-    color: document.getElementById('ad-color').value.trim() || '#7BC8F5',
-    intensity: parseInt(document.getElementById('ad-int').value) || 60,
-    sections: [
-      { title: 'Warm-Up (All)', blocks: [{ type: 'warmup', label: '~15 min', content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3×3 ×2 · Leg swings (left/right) · Leg swings (up/down)', optional: 'A-Runs 2×20m · Low Intensity Hop Series 2×15m · Top End Sprint 1×40m · Nathaniel Stretches' }] },
-      { title: 'Practice', blocks: [{ type: 'shared', label: 'All Athletes', drills: [{ name: 'Add drills via Edit Day', note: 'Tap Edit Day in the top right to customize this session' }] }] },
-      { title: 'Cool-Down (All)', blocks: [{ type: 'warmup', label: '~10 min', content: 'Static Stretch', optional: '400m jog/walk' }] }
-    ]
   });
-  saveData(APP);
-  closeModalDirect();
-  renderWeek(week);
-  showToast(`${name} added`);
+  const goals=w.goals||[];
+  const gEl=document.getElementById('w-goals');
+  gEl.innerHTML='';
+  if(goals.length){
+    goals.forEach(g=>{
+      const pc=g.group==='elite'?'e':'b';const dc=g.group==='elite'?'#E87A98':'#5BA3CC';
+      const tp=(g.targets||[]).map(t=>`<span class="gp ${pc}">${t}</span>`).join('');
+      const el=document.createElement('div');el.className='goal-row';
+      el.style.cursor='default';
+      el.innerHTML=`<div class="goal-dot" style="background:${dc}"></div><div style="flex:1"><div class="goal-name">${g.athleteName}</div><div class="goal-ev">${g.events}</div><div class="goal-tgts">${tp}</div><div class="goal-cue">${g.cue}</div></div>`;
+      gEl.appendChild(el);
+    });
+  } else {gEl.innerHTML='<div class="empty">No meet goals set.</div>';}
+  const rec=w.recovery||[];
+  document.getElementById('w-rec').innerHTML=rec.length?rec.map(r=>`<div class="note-row"><span class="note-badge ${r.type||'info'}">${r.badge}</span><span class="note-txt">${r.text}</span></div>`).join(''):'<div class="empty">No recovery notes.</div>';
 }
 
-// Edit Day
-function openEditDayModal() {
-  if (!sessionUnlocked) { requireAuth(openEditDayModal); return; }
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const day = week.days.find(d => d.id === currentDayId);
-  openModal(`
-    <div class="modal-title">Edit Day <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div class="modal-field">
-      <div class="modal-label">Day Name</div>
-      <input class="modal-input" id="ed-name" value="${day.name}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Focus</div>
-      <input class="modal-input" id="ed-focus" value="${day.focus}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Tag</div>
-      <input class="modal-input" id="ed-tag" value="${day.tag}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Intensity %</div>
-      <input class="modal-input" id="ed-int" type="number" min="0" max="100" value="${day.intensity}">
-    </div>
-    <div class="modal-field">
-      <div class="modal-label">Color</div>
-      <input class="modal-input" id="ed-color" value="${day.color}">
-    </div>
-    <button class="modal-btn" onclick="saveEditDay()">Save</button>
-    <button class="modal-btn modal-btn-danger" onclick="deleteDay()">Delete Day</button>
-  `);
+function openDay(id){CD=(CW.days||[]).find(d=>d.id===id);if(!CD)return;renderDay();go('s-day');}
+
+function renderDay(){
+  const d=CD;
+  document.getElementById('d-nav').textContent=d.name.toUpperCase();
+  document.getElementById('d-ey').textContent=CW.name;
+  document.getElementById('d-name').textContent=d.name;
+  document.getElementById('d-name').style.color=d.color;
+  document.getElementById('d-focus').textContent=d.focus;
+  document.getElementById('d-int-fill').style.cssText=`width:${d.intensity}%;background:${d.color}`;
+  document.getElementById('d-int-pct').textContent=d.intensity+'%';
+  const body=document.getElementById('d-body');body.innerHTML='';
+  (d.sections||[]).forEach(sec=>{
+    const sd=document.createElement('div');
+    const sh=document.createElement('div');sh.className='sec-head';
+    sh.innerHTML=`<div class="sec-lbl">${sec.title}</div><div class="sec-line"></div>`;
+    sd.appendChild(sh);
+    (sec.blocks||[]).forEach(b=>sd.appendChild(makeBlock(b)));
+    body.appendChild(sd);
+  });
 }
 
-function saveEditDay() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  const day = week.days.find(d => d.id === currentDayId);
-  day.name = document.getElementById('ed-name').value.trim() || day.name;
-  day.focus = document.getElementById('ed-focus').value.trim();
-  day.tag = document.getElementById('ed-tag').value.trim();
-  day.intensity = parseInt(document.getElementById('ed-int').value) || day.intensity;
-  day.color = document.getElementById('ed-color').value.trim();
-  saveData(APP);
-  closeModalDirect();
-  renderDay(week, day);
-  showToast('Day updated');
-}
-
-function deleteDay() {
-  const week = APP.weeks.find(w => w.id === currentWeekId);
-  week.days = week.days.filter(d => d.id !== currentDayId);
-  saveData(APP);
-  closeModalDirect();
-  goWeek();
-  showToast('Day deleted');
-}
-
-// ══════════════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════════════
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ══════════════════════════════════════════════
-// AUTH — PASSPHRASE (session-based)
-// ══════════════════════════════════════════════
-
-const PASSPHRASE = '5522';
-let sessionUnlocked = false;
-
-function requireAuth(callback) {
-  if (sessionUnlocked) { callback(); return; }
-
-  // Build passphrase modal
-  const html = `
-    <div class="modal-title" style="font-size:22px;">Coach Access <button class="modal-close" onclick="closeModalDirect()">×</button></div>
-    <div style="color:var(--muted);font-size:12px;margin-bottom:20px;font-weight:300;">Enter passphrase to edit</div>
-    <div class="modal-field">
-      <div class="modal-label">Passphrase</div>
-      <input class="modal-input" id="auth-input" type="password" placeholder="••••" inputmode="numeric"
-        style="font-size:22px;letter-spacing:6px;text-align:center;"
-        onkeydown="if(event.key==='Enter') submitAuth()">
-    </div>
-    <div id="auth-error" style="color:var(--optional);font-size:12px;text-align:center;height:18px;margin-bottom:4px;"></div>
-    <button class="modal-btn" onclick="submitAuth()">Unlock</button>
-  `;
-
-  // Store callback, open modal
-  window._authCallback = callback;
-  openModal(html);
-  setTimeout(() => {
-    const inp = document.getElementById('auth-input');
-    if (inp) inp.focus();
-  }, 350);
-}
-
-function submitAuth() {
-  const val = document.getElementById('auth-input')?.value;
-  if (val === PASSPHRASE) {
-    sessionUnlocked = true;
-    closeModalDirect();
-    showToast('Coach mode unlocked');
-    if (window._authCallback) {
-      const cb = window._authCallback;
-      window._authCallback = null;
-      setTimeout(cb, 200);
-    }
-  } else {
-    const err = document.getElementById('auth-error');
-    if (err) {
-      err.textContent = 'Incorrect passphrase';
-      const inp = document.getElementById('auth-input');
-      if (inp) { inp.value = ''; inp.focus(); }
-      setTimeout(() => { if (err) err.textContent = ''; }, 2000);
-    }
+function makeBlock(b){
+  const el=document.createElement('div');el.className='pblock '+b.type;
+  if(b.type==='warmup'){
+    el.innerHTML=`<div class="pb-lbl">${b.label}</div><div class="wu-text">${(b.content||'').replace(/\n/g,'<br>')}${b.optional?`<br><span class="opt-text">Optional: ${b.optional}</span>`:''}</div>`;
+    return el;
   }
+  const ls=b.center?'text-align:center':'';
+  let h=`<div class="pb-lbl" style="${ls}">${b.label}</div>`;
+  if(b.drills&&b.drills.length){
+    h+='<ul class="dl">';
+    b.drills.forEach(dr=>{h+=`<li class="${dr.dim?'dim':''}"><strong>${dr.name}</strong>${dr.note?`<em>${dr.note}</em>`:''}</li>`;});
+    h+='</ul>';
+  }
+  if(b.pills&&b.pills.length){h+='<div class="pills">'+b.pills.map(p=>`<span class="pill">${p}</span>`).join('')+'</div>';}
+  el.innerHTML=h;return el;
 }
 
-// ══════════════════════════════════════════════
-// AUTH GATE — wraps all edit actions
-// ══════════════════════════════════════════════
 
-function authGate(callback) {
-  requireAuth(callback);
-}
-
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-
-initApp();
-
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/JagJumpsApp/sw.js').catch(() => {});
-}
+document.addEventListener('DOMContentLoaded', init);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/JagJumpsApp/sw.js').catch(()=>{});}
 </script>
 </body>
 </html>

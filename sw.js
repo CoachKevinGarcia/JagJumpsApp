@@ -1,4 +1,4 @@
-const CACHE = 'jump-planner-v18';
+const CACHE = 'jump-planner-v19';
 const ASSETS = [
   '/JagJumpsApp/',
   '/JagJumpsApp/index.html',

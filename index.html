@@ -273,7 +273,7 @@ html,body{height:100%;background:#0D1B2A;color:#F5F0E8;font-family:'DM Sans',san
 
 <script>
 'use strict';
-const VER='v3.5';
+const VER='v4.2';
 const PASS='5522';
 let APP=null,CW=null,CD=null,UNLOCKED=false;
 
@@ -879,6 +879,410 @@ days:[
               pills: ['Wristband on before entering', 'Coach picks up packet', 'Warm-up outside venue']
             }
           ]
+        }
+      ]
+    }
+
+  ]
+},
+{
+  id: 'novi',
+  name: 'NoVi Week',
+  label: 'Senior Night + Norte Vista',
+  dates: 'Mon Apr 21 – Fri Apr 25',
+  color: '#4A90D9',
+  scheduleNotes: [
+    { badge: 'GROUP 1', type: 'info', text: 'AB · Juan · Daniela · Pablo · Camyla · Kate · Nayeli — starts with Coach on jumps.' },
+    { badge: 'GROUP 2', type: 'info', text: 'Sofia · Joel · Eduardo · Eddie · Levi · Sabrina · Emmanuel — starts with Coach Soto on sprints. Groups rotate mid-practice.' },
+    { badge: 'THU', type: 'warn', text: 'Last home dual meet of the season — Home vs. Norte Vista. Senior Night.' },
+    { badge: 'WED', type: 'info', text: 'Meet prep day — marks, a few full jumps. Keep it clean.' }
+  ],
+  recovery: [
+    { badge: 'FRI', type: 'info', text: 'Full recovery after Thursday meet. No jumping, no bounding.' },
+    { badge: 'SLEEP', type: 'info', text: '8+ hours every night. Two competitions in one week is a load.' },
+    { badge: 'HYDRATION', type: 'info', text: 'Consistent water all week. Thursday is a full meet day.' }
+  ],
+  meets: [
+    { date: '4/24 (Thu)', type: 'Home Dual Meet', name: 'Norte Vista — Senior Night' }
+  ],
+  athletes: [
+    { id: 'ab', name: 'AB Hernandez', group: 'elite', events: 'LJ · TJ · HJ', marks: "LJ 20'3 · TJ 42'6 · HJ 5'10" },
+    { id: 'juan', name: 'Juan Ledesma', group: 'elite', events: 'LJ · TJ · HJ', marks: "LJ 18'6.5 · TJ 34'6 · HJ 5'2" },
+    { id: 'daniela', name: 'Daniela Gamboa', group: 'beginner', events: 'LJ · TJ', marks: "LJ 12'6 · TJ 26'9" },
+    { id: 'pablo', name: 'Pablo Jara', group: 'beginner', events: 'LJ', marks: "LJ 17'2" },
+    { id: 'camyla', name: 'Camyla Ramirez-Tapia', group: 'beginner', events: 'LJ', marks: "LJ 9'10" },
+    { id: 'kate', name: 'Kate Gamboa', group: 'beginner', events: 'LJ · TJ', marks: "LJ 12'5" },
+    { id: 'nayeli', name: 'Nayeli Meza', group: 'beginner', events: 'LJ · TJ', marks: "LJ 11'6.25" },
+    { id: 'sofia', name: 'Sofia Gutierrez', group: 'beginner', events: 'LJ', marks: "LJ 9'7" },
+    { id: 'joel', name: 'Joel Oros', group: 'beginner', events: 'LJ', marks: "LJ 14'10" },
+    { id: 'eduardo', name: 'Eduardo Avina', group: 'beginner', events: 'LJ', marks: "LJ 10'9.5" },
+    { id: 'eddie', name: 'Eddie Soriano', group: 'beginner', events: 'LJ', marks: "LJ 12'7" },
+    { id: 'levi', name: 'Levi Gutierrez', group: 'beginner', events: 'LJ · TJ', marks: "LJ 14'7.5 · TJ 26'3" },
+    { id: 'sabrina', name: 'Sabrina', group: 'beginner', events: 'LJ', marks: 'No marks yet' },
+    { id: 'emmanuel', name: 'Emmanuel Casanova', group: 'beginner', events: 'LJ', marks: "LJ 16'5.5" }
+  ],
+  goals: [
+    { id: 'g-ab-novi', athleteName: 'AB Hernandez', group: 'elite', events: 'LJ · TJ · HJ', targets: [], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-juan-novi', athleteName: 'Juan Ledesma', group: 'elite', events: 'LJ · TJ · HJ', targets: ["LJ 19'0+", "TJ 35'0+", "HJ PR"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-pablo-novi', athleteName: 'Pablo Jara', group: 'beginner', events: 'LJ', targets: ["LJ 17'6+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-emmanuel-novi', athleteName: 'Emmanuel Casanova', group: 'beginner', events: 'LJ', targets: ["LJ 17'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-joel-novi', athleteName: 'Joel Oros', group: 'beginner', events: 'LJ', targets: ["LJ 15'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-levi-novi', athleteName: 'Levi Gutierrez', group: 'beginner', events: 'LJ · TJ', targets: ["LJ 15'0+", "TJ 27'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-daniela-novi', athleteName: 'Daniela Gamboa', group: 'beginner', events: 'LJ · TJ', targets: ["LJ 13'0+", "TJ 27'6+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-kate-novi', athleteName: 'Kate Gamboa', group: 'beginner', events: 'LJ · TJ', targets: ["LJ 13'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-nayeli-novi', athleteName: 'Nayeli Meza', group: 'beginner', events: 'LJ · TJ', targets: ["LJ 12'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-eddie-novi', athleteName: 'Eddie Soriano', group: 'beginner', events: 'LJ', targets: ["LJ 13'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-eduardo-novi', athleteName: 'Eduardo Avina', group: 'beginner', events: 'LJ', targets: ["LJ 11'6+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-camyla-novi', athleteName: 'Camyla Ramirez-Tapia', group: 'beginner', events: 'LJ', targets: ["LJ 10'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-sofia-novi', athleteName: 'Sofia Gutierrez', group: 'beginner', events: 'LJ', targets: ["LJ 10'0+"], cue: 'Execute the week and HAVE FUN' },
+    { id: 'g-sabrina-novi', athleteName: 'Sabrina', group: 'beginner', events: 'LJ', targets: ['First legal mark'], cue: 'Execute the week and HAVE FUN' }
+  ],
+  days: [
+
+    {
+      id: 'mon',
+      name: 'Monday',
+      focus: 'Penultimate + Landing Pattern + Single Leg Bounds + Mat Jumps',
+      tag: 'Technical Day',
+      color: '#7BC8F5',
+      intensity: 60,
+      sections: [
+        {
+          title: 'Warm-Up (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~15 min',
+              content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',
+              optional: 'A-Runs 2x20m · Low Intensity Hop Series 2x15m'
+            }
+          ]
+        },
+        {
+          title: 'Group Rotation',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'Group 1 starts with Coach — Group 2 starts with Coach Soto · Switch at midpoint',
+              drills: [
+                { name: 'Group 1: AB · Juan · Daniela · Pablo · Camyla · Kate · Nayeli', note: 'Jumps runway with Coach.' },
+                { name: 'Group 2: Sofia · Joel · Eduardo · Eddie · Levi · Sabrina · Emmanuel', note: 'Sprints with Coach Soto. Rotate in at midpoint.' }
+              ],
+              pills: ['Rotate at midpoint', 'Both groups hit all content']
+            }
+          ]
+        },
+        {
+          title: 'Penultimate Step — Re-Emphasis (Jumps Group)',
+          blocks: [
+            {
+              type: 'beginner',
+              label: 'All Athletes — Feel It First',
+              drills: [
+                { name: 'Walk-through — last 3 steps, count out loud', note: 'Long–short–UP. Penultimate foot lands long and low. Last step punches up. Say it every rep.' },
+                { name: 'Standing penultimate isolation — 3x6 reps', note: 'Step long with the penultimate foot, drive off the takeoff. No run. Just the rhythm of the last two steps.' },
+                { name: 'Short jog into penultimate pop-up — 4x', note: '5m jog, execute long penultimate, pop up. No pit yet. Feel the lowering of the hips on the penultimate.' }
+              ],
+              pills: ['Long–short–UP', 'Feel before speed']
+            },
+            {
+              type: 'elite',
+              label: 'AB · Juan — Speed Through It',
+              drills: [
+                { name: 'Approach-only runs — 4x', note: 'Full approach, no jump. Penultimate must stay aggressive at speed — this is where it breaks down.' },
+                { name: 'Short approach pop-up — 4x @ 85%', note: 'Full approach, penultimate emphasis, minimal jump. Feel the difference when the penultimate is active vs. passive.' }
+              ],
+              pills: ['No deceleration', 'Aggressive penultimate at speed']
+            }
+          ]
+        },
+        {
+          title: 'Single Leg Bounds (All)',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'Both Groups — After Penultimate Work',
+              drills: [
+                { name: 'Single-leg bounds — 3x20m each leg', note: 'Short, stiff ground contact. Drive the knee up each rep. This is the stretch-shortening cycle you need off the board.' },
+                { name: 'Focus: rebound quality not distance', note: 'If ground contact is long and soft, reset. The pop is the point.' }
+              ],
+              pills: ['3x20m each leg', 'Stiff contact', 'Full rest between sets']
+            }
+          ]
+        },
+        {
+          title: 'Landing Pattern — Mat Jumps (LJ)',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'All Athletes — LJ Landing Emphasis',
+              drills: [
+                { name: 'Use High Jump pads as landing zone', note: 'Short approach — 4 to 6 strides. The goal is the flight and landing, not distance.' },
+                { name: 'In the air: heels up, knees up, reach forward', note: 'Drive both knees toward the chest after takeoff. Hold the position as long as possible before landing. Do not drop the feet early.' },
+                { name: 'Landing: strike heels first, push knees through', note: 'Heels contact the mat, knees drive forward to prevent sitting back. Hold through the window.' },
+                { name: 'Reps: by feel — stop when form breaks', note: 'This is a teaching drill. If the athlete is not holding the position, correct before adding more reps.' }
+              ],
+              pills: ['Short approach', 'Heels up · knees up · reach', 'Hold through landing', 'Quality over reps']
+            }
+          ]
+        },
+        {
+          title: 'TJ — 2nd Phase Emphasis (TJ Athletes)',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'AB · Juan · Daniela · Levi · Kate · Nayeli',
+              drills: [
+                { name: 'Phase walk-through — 3x slow rhythm', note: 'Hop–step–jump aloud. Focus lands on the step contact — flat foot, aggressive, timed.' },
+                { name: 'Step phase hold — hop + hold step, 3x6', note: 'Execute the hop, land the step with a flat foot, hold the position. Feel the ground contact timing.' },
+                { name: 'Over mat or hurdle — step phase emphasis', note: 'Place mat or hurdle at step landing zone. Drive over and through it on the step contact. Forces height and aggression on 2nd phase.' }
+              ],
+              pills: ['Flat foot on step', 'Attack the ground', 'Drive through — not over']
+            }
+          ]
+        },
+        {
+          title: 'Cool-Down (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~10 min',
+              content: 'Static Stretch',
+              optional: '400m jog/walk'
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: 'tue',
+      name: 'Tuesday',
+      focus: 'Knee Drive Cycles + Mark Tune-Up + Short Approach Full Jumps',
+      tag: 'Technical Day',
+      color: '#7BC8F5',
+      intensity: 65,
+      sections: [
+        {
+          title: 'Warm-Up (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~15 min',
+              content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',
+              optional: 'A-Runs 2x20m · Low Intensity Hop Series 2x15m · Top End Sprint 1x40m'
+            }
+          ]
+        },
+        {
+          title: 'Group Rotation',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'Group 1 starts with Coach — Group 2 starts with Coach Soto · Switch at midpoint',
+              drills: [
+                { name: 'Group 1: AB · Juan · Daniela · Pablo · Camyla · Kate · Nayeli', note: 'Jumps runway with Coach.' },
+                { name: 'Group 2: Sofia · Joel · Eduardo · Eddie · Levi · Sabrina · Emmanuel', note: 'Sprints with Coach Soto. Rotate in at midpoint.' }
+              ],
+              pills: ['Same groups as Monday', 'Rotate at midpoint']
+            }
+          ]
+        },
+        {
+          title: 'Pop-Up Knee Drive Cycles (All)',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'All Athletes — Barrier or Mat',
+              drills: [
+                { name: 'Setup: start at knee to mid-calf height', note: 'Mat or hurdle set low to start — knee to mid-calf. The goal is the drive, not the clearance.' },
+                { name: 'Get the heel up', note: 'As the knee drives over the barrier, the heel of the drive leg must come up tight — heel to glute. Sloppy heel means incomplete drive.' },
+                { name: 'Progressive overload — raise height each set', note: 'Start low, add height as the athlete demonstrates clean heel and knee drive. Never raise until form is earned.' },
+                { name: 'Single leg only — takeoff leg each rep', note: 'Both legs get reps. Takeoff leg is primary.' },
+                { name: 'Reps by feel — stop when heel or drive quality drops', note: 'If the heel stops coming up or the knee clears passively, the set is done.' }
+              ],
+              pills: ['Start knee to mid-calf', 'Heel up tight', 'Raise height progressively', 'Quality stops the set']
+            }
+          ]
+        },
+        {
+          title: 'Mark Tune-Up (All)',
+          blocks: [
+            {
+              type: 'beginner',
+              label: 'All Athletes — Starting Mark + Board',
+              drills: [
+                { name: 'Run updated approach — 3x per event', note: 'Confirm starting mark is still consistent after recent PRs. Adjust if needed.' },
+                { name: 'Note: starting mark and board distance only', note: 'Two checkpoints. Keep it simple and repeatable.' }
+              ],
+              pills: ['Starting mark', 'Board distance', '3 runs to confirm']
+            }
+          ]
+        },
+        {
+          title: 'Short Approach Full Jumps — LJ (All)',
+          blocks: [
+            {
+              type: 'beginner',
+              label: 'All Athletes — Apply the Week',
+              drills: [
+                { name: 'Short approach LJ — 4 attempts @ 80%', note: 'Apply penultimate and landing hold together. One cue per jump — alternate between them.' },
+                { name: 'After each jump: self-assess the landing', note: 'Did the heels contact first? Did the knees drive through? This is the feedback loop.' }
+              ],
+              pills: ['4 jumps', '80% effort', 'One cue per jump']
+            }
+          ]
+        },
+        {
+          title: 'TJ — 2nd Phase Over Object (TJ Athletes)',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'AB · Juan · Daniela · Levi · Kate · Nayeli',
+              drills: [
+                { name: 'Hop into step over mat or hurdle — 3x6', note: 'Execute the hop, drive the step phase over the mat or hurdle. Forces height and aggression. Flat foot landing on the far side.' },
+                { name: 'Rhythm bounds — 3x20m', note: 'Hop–step–hop–step continuous. Flat foot each contact. Attack the ground — do not float.' },
+                { name: 'Full TJ approach — 3 attempts @ 80%', note: 'Apply step phase work. Hold 2nd phase into the pit. Aggressive contacts throughout.' }
+              ],
+              pills: ['Over mat or hurdle', 'Flat foot step', 'Rhythm into full jump']
+            }
+          ]
+        },
+        {
+          title: 'Cool-Down (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~10 min',
+              content: 'Static Stretch',
+              optional: '400m jog/walk'
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: 'wed',
+      name: 'Wednesday',
+      focus: 'Meet Day Prep — Marks + A Few Full Jumps',
+      tag: 'Prep Day',
+      color: '#E87A98',
+      intensity: 35,
+      sections: [
+        {
+          title: 'Warm-Up (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~15 min',
+              content: 'Dynamic stretching circuit\nHurdle Hip Mobility 3x3 x2 · Leg swings (left/right) · Leg swings (up/down)',
+              optional: 'A-Runs 2x20m · Low Intensity Hop Series 2x15m'
+            }
+          ]
+        },
+        {
+          title: 'Approach Confirmation (All)',
+          blocks: [
+            {
+              type: 'beginner',
+              label: 'All Athletes — Starting Mark + Board',
+              drills: [
+                { name: 'Approach-only runs — 3x per event', note: 'Spikes on. Confirm starting mark and board distance are consistent. Adjust if needed.' },
+                { name: 'Walk the approach', note: 'Count steps. Know exactly where you are on the runway.' }
+              ],
+              pills: ['Spikes on', 'Confirm marks', 'No surprises Thursday']
+            }
+          ]
+        },
+        {
+          title: 'A Few Full Jumps (All)',
+          blocks: [
+            {
+              type: 'beginner',
+              label: 'All Athletes — 2 Jumps Max',
+              drills: [
+                { name: 'LJ — 2 full attempts @ max effort', note: 'One cue only: penultimate or landing hold — pick one and commit to it.' },
+                { name: 'Walk away feeling good', note: 'This is activation, not a session. Leave the runway confident.' }
+              ],
+              pills: ['2 jumps max', 'One cue', 'Leave confident']
+            }
+          ]
+        },
+        {
+          title: 'Cool-Down (All)',
+          blocks: [
+            {
+              type: 'warmup',
+              label: '~10 min',
+              content: 'Static Stretch',
+              optional: '400m jog/walk'
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: 'thu',
+      name: 'Thursday',
+      focus: 'Home vs. Norte Vista — Senior Night',
+      tag: 'Meet Day',
+      color: '#E87A5A',
+      intensity: 100,
+      sections: [
+        {
+          title: 'Meet Day — Home vs. Norte Vista',
+          blocks: [
+            {
+              type: 'shared',
+              label: 'All Competitors — Full Send',
+              drills: [
+                { name: 'Full warm-up before first event', note: 'Dynamic circuit, approach runs, activation drills. Do not skip.' },
+                { name: 'One cue per jump — alternate penultimate and landing hold', note: 'Jump 1: penultimate. Jump 2: hold through the window. Stay in the week.' },
+                { name: 'Marks confirmed before the runway opens', note: 'No guessing on meet day. You confirmed them Wednesday.' },
+                { name: 'Chase PRs — home meet, home crowd', note: 'Last home dual meet of the season. Make it count.' }
+              ],
+              pills: ['Full effort', 'Chase PRs', 'One cue per jump']
+            }
+          ]
+        },
+        {
+          title: '🎉 Senior Night!',
+          blocks: [
+            {
+              type: 'shared',
+              label: '',
+              drills: [],
+              pills: []
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: 'fri',
+      name: 'Friday',
+      focus: 'Recovery',
+      tag: 'Recovery',
+      color: '#B0B0C4',
+      intensity: 10,
+      sections: [
+        {
+          title: 'Recovery Day — All Athletes',
+          blocks: [
+            {
+              type: 'warmup',
+              label: 'Active Recovery Only',
+              content: 'Light jog 5-10 min · Full static stretch · Mobility work\nNo jumping. No bounding. No heavy lifting.',
+              optional: 'Ice any soreness from Thursday'
+            }
+          ]
+        },
+        {
+          title: 'PICTURE DAY TODAY: BRING YOUR UNIFORM 📷🤳',
+          blocks: []
         }
       ]
     }
